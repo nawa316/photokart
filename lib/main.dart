@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'homepage.dart';
+import 'screen/onboarding_page.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const PhotoKartApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class PhotoKartApp extends StatelessWidget {
+  const PhotoKartApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -14,10 +14,10 @@ class MyApp extends StatelessWidget {
       title: 'PhotoKart',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF7B95CF)),
-        useMaterial3: true,
+        useMaterial3: false,
+        fontFamily: 'Poppins', // pastikan sudah di-set di pubspec.yaml
       ),
-      home: const HomePage(),
+      home: const OnboardingPage(),
     );
   }
 }
