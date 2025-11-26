@@ -10,7 +10,7 @@ class OnboardingPage extends StatelessWidget {
     final width = size.width;
 
     // lebar “kartu” maksimal 430 biar mirip desain, tapi mengecil otomatis di layar kecil
-    final cardWidth = width.clamp(320.0, 430.0);
+    final cardWidth = width.clamp(320.0, 440.0);
 
     return Scaffold(
       backgroundColor: const Color(0xFF2C2C2C), // bezel luar hp
