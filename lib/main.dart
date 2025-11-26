@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'homepage.dart';
+import 'suzy_product.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF7B95CF)),
         useMaterial3: true,
       ),
-      home: const HomePage(),
+      home: const SuzyProduct(),
     );
   }
 }
