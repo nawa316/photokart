@@ -194,13 +194,22 @@ class HeaderSection extends StatelessWidget {
                   color: Color(0xFF7B95CF),
                 ),
                 const SizedBox(width: 10),
-                const Expanded(
-                  child: Text(
-                    'Search photocards',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFF7B95CF),
+                Expanded(
+                  child: TextField(
+                    decoration: const InputDecoration(
+                      hintText: 'Search photocards',
+                      hintStyle: TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF7B95CF),
+                      ),
+                      border: InputBorder.none,
+                      isCollapsed: true,
                     ),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF304369),
+                    ),
+                    textInputAction: TextInputAction.search,
                   ),
                 ),
                 Container(
