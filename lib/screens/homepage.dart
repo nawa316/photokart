@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../components/app_header.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,15 +18,18 @@ class _HomePageState extends State<HomePage> {
       body: SafeArea(
         child: Column(
           children: [
-            const HeaderSection(),
+            const AppHeader(
+              title: 'PhotoKart',
+              showSearch: true,
+            ),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 24),
-                    const Center(
+                  children: const [
+                    SizedBox(height: 24),
+                    Center(
                       child: Text(
                         'Here are your Top Sales!',
                         style: TextStyle(
@@ -35,13 +39,13 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    const FeaturedCard(),
-                    const SizedBox(height: 32),
-                    const TopSalesHeader(),
-                    const SizedBox(height: 16),
-                    const TopSalesList(),
-                    const SizedBox(height: 40),
+                    SizedBox(height: 20),
+                    FeaturedCard(),
+                    SizedBox(height: 32),
+                    TopSalesHeader(),
+                    SizedBox(height: 16),
+                    TopSalesList(),
+                    SizedBox(height: 40),
                   ],
                 ),
               ),
@@ -88,147 +92,6 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class HeaderSection extends StatelessWidget {
-  const HeaderSection({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Color(0xFFCFD5FF),
-            Color(0xFFF7FAFE),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(32),
-          bottomRight: Radius.circular(32),
-        ),
-      ),
-      padding: const EdgeInsets.fromLTRB(18, 10, 18, 18),
-      child: Column(
-        children: [
-          SizedBox(
-            height: 22,
-            child: Row(
-              children: [
-                const Text(
-                  '9:41',
-                  style: TextStyle(
-                    color: Color(0xFF394265),
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: -0.3,
-                  ),
-                ),
-                const Spacer(),
-                Row(
-                  children: const [
-                    Icon(
-                      Icons.signal_cellular_4_bar,
-                      size: 16,
-                      color: Color(0xFF394265),
-                    ),
-                    SizedBox(width: 4),
-                    Icon(
-                      Icons.wifi,
-                      size: 16,
-                      color: Color(0xFF394265),
-                    ),
-                    SizedBox(width: 4),
-                    Icon(
-                      Icons.battery_full,
-                      size: 18,
-                      color: Color(0xFF394265),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 10),
-          const Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              'PhotoKart',
-              style: TextStyle(
-                color: Color(0xFF304369),
-                fontSize: 32,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Container(
-            height: 44,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(
-                color: const Color(0xFF7B95CF),
-                width: 1,
-              ),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x1A7B95CF),
-                  blurRadius: 20,
-                  offset: Offset(0, 8),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                const SizedBox(width: 16),
-                const Icon(
-                  Icons.search,
-                  size: 18,
-                  color: Color(0xFF7B95CF),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: TextField(
-                    decoration: const InputDecoration(
-                      hintText: 'Search photocards',
-                      hintStyle: TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF7B95CF),
-                      ),
-                      border: InputBorder.none,
-                      isCollapsed: true,
-                    ),
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFF304369),
-                    ),
-                    textInputAction: TextInputAction.search,
-                  ),
-                ),
-                Container(
-                  margin: const EdgeInsets.only(right: 10),
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF7B95CF),
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                  child: const Icon(
-                    Icons.mic_none,
-                    size: 18,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }
