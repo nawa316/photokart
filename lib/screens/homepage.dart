@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../components/app_header.dart';
 import '../components/bottom_nav_bar.dart';
+import '../screens/hanni_product.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -10,10 +11,29 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _currentIndex = 2;
+  // tetap 2 supaya icon tengah (PhotoKart) yang aktif di homepage
+  final int _currentIndex = 2;
 
-  void _onNavTap(int index) {
-    if (index != 2) return;
+  void _onNavTap(BuildContext context, int index) {
+    // kalau tekan icon yang sudah aktif, tidak melakukan apa apa
+    if (index == _currentIndex) return;
+
+    // sementara: kalau tekan icon bag (index 0) buka halaman HanniProduct
+    if (index == 0) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const HanniProduct(),
+        ),
+      );
+      return;
+    }
+
+    // nanti kalau sudah ada halaman lain bisa ditambah di sini
+    // contoh:
+    // if (index == 1) { ... ke halaman Cart ... }
+    // if (index == 3) { ... ke halaman Chat ... }
+    // if (index == 4) { ... ke halaman Profile ... }
   }
 
   @override
@@ -60,7 +80,7 @@ class _HomePageState extends State<HomePage> {
       ),
       bottomNavigationBar: BottomNavBar(
         currentIndex: _currentIndex,
-        onTap: _onNavTap,
+        onTap: (index) => _onNavTap(context, index),
       ),
     );
   }
@@ -91,7 +111,9 @@ class FeaturedCard extends StatelessWidget {
           child: Column(
             children: [
               ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(20),
+                ),
                 child: Image.asset(
                   'assets/images/hanni.png',
                   height: 236,

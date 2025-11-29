@@ -5,11 +5,13 @@ import 'search_bar_widget.dart';
 class AppHeader extends StatelessWidget {
   final String title;
   final bool showSearch;
+  final bool showBack;
 
   const AppHeader({
     super.key,
     required this.title,
     this.showSearch = false,
+    this.showBack = false,
   });
 
   @override
@@ -36,6 +38,7 @@ class AppHeader extends StatelessWidget {
         children: [
           const StatusBarWidget(),
           const SizedBox(height: 10),
+
           Text(
             title,
             style: const TextStyle(
@@ -44,6 +47,33 @@ class AppHeader extends StatelessWidget {
               fontWeight: FontWeight.w600,
             ),
           ),
+
+          if (showBack) ...[
+            const SizedBox(height: 8),
+            GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  Icon(
+                    Icons.arrow_back_ios_new,
+                    size: 18,
+                    color: Color(0xFF7B95CF),
+                  ),
+                  SizedBox(width: 4),
+                  Text(
+                    'Back',
+                    style: TextStyle(
+                      color: Color(0xFF7B95CF),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+
           if (showSearch) ...[
             const SizedBox(height: 16),
             const SearchBarWidget(),
