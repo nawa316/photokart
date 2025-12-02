@@ -1,5 +1,7 @@
+// lib/ahul_product.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'product_detail_card.dart';
 
 class AhulProduct extends StatelessWidget {
   const AhulProduct({super.key});
@@ -15,90 +17,40 @@ class AhulProduct extends StatelessWidget {
       bottomNavigationBar: const _BottomNav(),
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.only(bottom: h * 0.04),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _headerWithBackground(context, h, w),
-
-                SizedBox(height: h * 0.025),
-
-                // Nama produk
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: w * 0.05),
-                  child: Text(
-                    "Ahul IndoKor",
-                    style: GoogleFonts.poppins(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w600,
-                      color: const Color(0xFF304369),
-                    ),
-                  ),
-                ),
-
-                SizedBox(height: h * 0.018),
-
-                // FOTO PRODUK
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: w * 0.05),
-                  child: _productImage(context),
-                ),
-
-                SizedBox(height: h * 0.025),
-
-                // HARGA + SALES
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: w * 0.05),
-                  child: _priceAndSales(),
-                ),
-
-                SizedBox(height: h * 0.01),
-
-                // STOCK
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: w * 0.05),
-                  child: _stockText(),
-                ),
-
-                SizedBox(height: h * 0.02),
-
-                // DESCRIPTION
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: w * 0.05),
-                  child: _descriptionSection(),
-                ),
-
-                SizedBox(height: h * 0.02),
-
-                // REVIEW BAR
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: w * 0.05),
-                  child: _reviewBar(context),
-                ),
-
-                SizedBox(height: h * 0.03),
-
-                // UPDATE BUTTON
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: w * 0.2),
-                  child: _updateButton(context),
-                ),
-              ],
-            ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _headerWithBackground(context, h, w),
+              ProductDetailCard(
+                productName: "Ahul IndoKor",
+                imageAsset: 'assets/images/ahul.png',
+                priceText: "RP 100.200.000,00",
+                salesText: "Sales : 50 pcs",
+                stockText: "Stock : 6 pcs",
+                descriptionText: "Description : Photocard Rare",
+                ratingText: "4.0",
+                tags: const [
+                  "Good Quality (50)",
+                  "Good (50)",
+                ],
+                onUpdatePressed: () {
+                  // TODO: Navigate ke halaman edit Ahul
+                  // Navigator.push(...);
+                  _showUpdateDialog(context);
+                },
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  // ================= HEADER =================
-
   Widget _headerWithBackground(
       BuildContext context, double screenHeight, double screenWidth) {
     return Container(
       width: double.infinity,
-      height: screenHeight * 0.20, // ~180 pada tinggi 900-an
+      height: screenHeight * 0.20,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -122,7 +74,6 @@ class AhulProduct extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // judul
           Text(
             "PhotoKart",
             style: GoogleFonts.poppins(
@@ -131,17 +82,11 @@ class AhulProduct extends StatelessWidget {
               color: const Color(0xFF304369),
             ),
           ),
-
           const SizedBox(height: 16),
-
-          // Back + Search bar
           Row(
             children: [
-              // Tombol Back
               GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                },
+                onTap: () => Navigator.pop(context),
                 child: Row(
                   children: [
                     const Icon(
@@ -161,10 +106,7 @@ class AhulProduct extends StatelessWidget {
                   ],
                 ),
               ),
-
               SizedBox(width: screenWidth * 0.03),
-
-              // Search
               Expanded(
                 child: Container(
                   height: 34,
@@ -211,193 +153,23 @@ class AhulProduct extends StatelessWidget {
     );
   }
 
-  // ================= PRODUCT IMAGE =================
-
-  Widget _productImage(BuildContext context) {
-    final w = MediaQuery.of(context).size.width;
-
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: Container(
-        width: double.infinity,
-        // proporsi mirip 384x295 → 4:3
-        height: w * 0.75,
-        decoration: BoxDecoration(
-          color: const Color(0x337B95CF),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0x337B95CF),
-              blurRadius: 30,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Image.asset(
-          'assets/images/ahul.png',
-          fit: BoxFit.cover, // biar full lebar seperti di Figma
-        ),
-      ),
-    );
-  }
-
-  // ================= TEXT SECTIONS =================
-
-  Widget _priceAndSales() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          "RP 100.200.000,00",
-          style: GoogleFonts.poppins(
-            fontSize: 24,
-            fontWeight: FontWeight.w500,
-            color: const Color(0xFF304369),
-          ),
-        ),
-        Text(
-          "Sales : 50 pcs",
-          style: GoogleFonts.poppins(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: const Color(0xFF304369),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _stockText() {
-    return Text(
-      "Stock : 6 pcs",
-      style: GoogleFonts.poppins(
-        fontSize: 16,
-        fontWeight: FontWeight.w500,
-        color: const Color(0xFF304369),
-      ),
-    );
-  }
-
-  Widget _descriptionSection() {
-    return Text(
-      "Description :  Photocard Rare",
-      style: GoogleFonts.poppins(
-        fontSize: 18,
-        fontWeight: FontWeight.w500,
-        color: const Color(0xFF304369),
-      ),
-    );
-  }
-
-  // ================= REVIEW BAR =================
-
-  Widget _reviewBar(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFE7ECF8),
-        borderRadius: BorderRadius.circular(40),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.15),
-            offset: const Offset(0, 4),
-            blurRadius: 10,
-            spreadRadius: 0,
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Text(
-            "4.0",
-            style: GoogleFonts.poppins(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: const Color(0xFF304369),
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Row(
-              children: [
-                _smallChip("Good Quality (50)"),
-                const SizedBox(width: 8),
-                _smallChip("Good (50)"),
-              ],
-            ),
-          ),
-          const Icon(
-            Icons.chevron_right,
-            color: Color(0xFF637FBF),
-            size: 26,
+  void _showUpdateDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text("Update Product"),
+        content: const Text("This will open the edit product page (dummy)."),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("OK"),
           ),
         ],
       ),
     );
   }
-
-  Widget _smallChip(String label) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 5,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Text(
-        label,
-        style: GoogleFonts.poppins(
-          fontSize: 10,
-          fontWeight: FontWeight.w500,
-          color: const Color(0xFF304369),
-        ),
-      ),
-    );
-  }
-
-  // ================= BUTTON =================
-
-  Widget _updateButton(BuildContext context) {
-  final w = MediaQuery.of(context).size.width;
-
-  return Center(
-    child: Container(
-      width: w * 0.45,
-      height: 48,
-      decoration: BoxDecoration(
-        // warna background tombol dibuat lebih muda (pastel)
-        color: const Color(0xFFBFCBF0), // kira-kira turunan lembut dari 7B95CF
-        borderRadius: BorderRadius.circular(50),
-        boxShadow: [
-          BoxShadow(
-            // bayangannya pakai warna 7B95CF dengan opacity
-            color: const Color(0xFF7B95CF).withOpacity(0.5),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Center(
-        child: Text(
-          "Update",
-          style: GoogleFonts.poppins(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF304369), // warna teks dari Figma
-          ),
-        ),
-      ),
-    ),
-  );
 }
-}
-
-// ================= BOTTOM NAV =================
 
 class _BottomNav extends StatelessWidget {
   const _BottomNav({super.key});
@@ -424,11 +196,11 @@ class _BottomNav extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _navIcon('assets/images/bag.png'),          // 39 x 39
-          _navIcon('assets/images/cart.png'),         // 39 x 39
-          _navIcon('assets/images/center.png', size: 58), // 58 x 58 (ikon tengah)
-          _navIcon('assets/images/chat.png'),         // 39 x 39
-          _navIcon('assets/images/profile.png'),      // 39 x 39
+          _navIcon('assets/images/bag.png'),
+          _navIcon('assets/images/cart.png'),
+          _navIcon('assets/images/center.png', size: 58),
+          _navIcon('assets/images/chat.png'),
+          _navIcon('assets/images/profile.png'),
         ],
       ),
     );
@@ -445,4 +217,3 @@ class _BottomNav extends StatelessWidget {
     );
   }
 }
-
