@@ -136,7 +136,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 children: [
                   const SizedBox(height: 40),
                   IconButton(
-                    onPressed: () => context.pop(),
+                    onPressed: () => context.go('/onboarding'),
                     icon: const Icon(Icons.arrow_back),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),

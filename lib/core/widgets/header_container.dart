@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-import 'search_bar_widget.dart';
 
-class AppHeader extends StatelessWidget {
-  final String title;
-  final bool showSearch;
+class HeaderContainer extends StatelessWidget {
+  final List<Widget> children;
 
-  const AppHeader({
+  const HeaderContainer({
     super.key,
-    required this.title,
-    this.showSearch = false,
+    required this.children,
   });
 
   @override
@@ -32,20 +29,7 @@ class AppHeader extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              color: Color(0xFF304369),
-              fontSize: 32,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          if (showSearch) ...[
-            const SizedBox(height: 16),
-            const SearchBarWidget(),
-          ],
-        ],
+        children: children,
       ),
     );
   }

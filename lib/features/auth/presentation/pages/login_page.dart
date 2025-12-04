@@ -91,7 +91,7 @@ class _LoginPageState extends State<LoginPage> {
               backgroundColor: Colors.green,
             ),
           );
-          context.go('/homepage');
+          context.go('/');
         }
       },
     );
@@ -119,7 +119,7 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   const SizedBox(height: 40),
                   IconButton(
-                    onPressed: () => context.pop(),
+                    onPressed: () => context.go('/onboarding'),
                     icon: const Icon(Icons.arrow_back),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),

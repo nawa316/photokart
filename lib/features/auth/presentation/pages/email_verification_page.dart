@@ -67,7 +67,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
           backgroundColor: Colors.green,
         ),
       );
-      context.go('/homepage');
+      context.go('/');
     }
   }
 

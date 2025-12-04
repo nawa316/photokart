@@ -6,6 +6,7 @@ import '../features/auth/presentation/pages/login_page.dart';
 import '../features/auth/presentation/pages/register_page.dart';
 import '../features/auth/presentation/pages/email_verification_page.dart';
 import '../features/home/presentation/pages/homepage.dart';
+import '../features/product/presentation/pages/list_product_page.dart';
 
 final GoRouter appRouter = GoRouter(
   routes: [
@@ -31,10 +32,24 @@ final GoRouter appRouter = GoRouter(
         );
       },
     ),
+    GoRoute(
+      name: 'top-rating',
+      path: '/top-rating',
+      builder: (context, state) => const TopRating(),
+    ),
   ],
   redirect: (context, state) {
     final session = Supabase.instance.client.auth.currentSession;
-    if (session == null) {
+    final allowedPaths = [
+      '/login',
+      '/register',
+      '/onboarding',
+    ];
+    // Allow email-verification page without session
+    final isEmailVerification = state.uri.path.startsWith('/email-verification');
+    if (session == null &&
+        !allowedPaths.contains(state.uri.path) &&
+        !isEmailVerification) {
       return '/onboarding';
     }
     return null;

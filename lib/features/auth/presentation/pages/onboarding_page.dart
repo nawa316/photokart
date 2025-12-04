@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:flutter/gestures.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
@@ -223,24 +225,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: Image.asset(
-                        'assets/images/google.png',
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    const Text(
-                      'Sign in with google',
-                      style: TextStyle(
-                        color: Color(0xFF304369),
-                        fontSize: 16,
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
+                    // ...icon dan teks Google Sign In...
                   ],
                 ),
               ),
@@ -256,19 +241,19 @@ class _OnboardingPageState extends State<OnboardingPage> {
               height: 48,
               child: ElevatedButton(
                 onPressed: () {
-                  // TODO: navigate to register page
+                  context.go('/register');
                 },
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.zero,
                   backgroundColor: const Color(0xFF7B95CF),
                   elevation: 4,
-                  shadowColor: Colors.black26,
+                  shadowColor: Colors.black38,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(40),
                   ),
                 ),
                 child: const Text(
-                  'Create an account',
+                  'Create Account',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -285,20 +270,25 @@ class _OnboardingPageState extends State<OnboardingPage> {
           Padding(
             padding: const EdgeInsets.only(bottom: 8.0),
             child: RichText(
-              text: const TextSpan(
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 14,
+              text: TextSpan(
+                style: const TextStyle(
                   color: Color(0xFF304369),
+                  fontSize: 14,
+                  fontFamily: 'Poppins',
                 ),
                 children: [
-                  TextSpan(text: 'Already have an account? '),
+                  const TextSpan(text: 'Already have an account? '),
                   TextSpan(
-                    text: 'Sign in',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
+                    text: 'Sign In',
+                    style: const TextStyle(
                       color: Color(0xFF7B95CF),
+                      fontWeight: FontWeight.bold,
+                      decoration: TextDecoration.underline,
                     ),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        context.go('/login');
+                      },
                   ),
                 ],
               ),
