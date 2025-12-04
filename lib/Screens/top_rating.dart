@@ -36,14 +36,18 @@ class TopRating extends StatelessWidget {
               ],
             ),
             
-            // Scrollable product cards only
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
-                  children: Product.sampleProducts.map((product) {
+                  children: Product.sampleProducts.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final product = entry.value;
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                      child: ProductCard(product: product),
+                      child: ProductCard(
+                        product: product,
+                        rank: index + 1, // +1 because index starts at 0
+                      ),
                     );
                   }).toList(),
                 ),
