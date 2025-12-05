@@ -7,6 +7,7 @@ import '../features/auth/presentation/pages/register_page.dart';
 import '../features/auth/presentation/pages/email_verification_page.dart';
 import '../features/home/presentation/pages/homepage.dart';
 import '../features/product/presentation/pages/list_product_page.dart';
+import '../features/review/presentation/pages/reviewpage.dart';
 
 final GoRouter appRouter = GoRouter(
   routes: [
@@ -36,6 +37,11 @@ final GoRouter appRouter = GoRouter(
       name: 'top-rating',
       path: '/top-rating',
       builder: (context, state) => const TopRating(),
+    ),
+    GoRoute(
+      name: 'rating-reviews',
+      path: '/rating-reviews',
+      builder: (context, state) => const RatingReviewsPage(),
     ),
   ],
   redirect: (context, state) {
