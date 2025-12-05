@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class PhotoKartBottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -19,7 +20,13 @@ class PhotoKartBottomNavBar extends StatelessWidget {
       ),
       child: BottomNavigationBar(
         currentIndex: currentIndex,
-        onTap: onTap,
+        onTap: (index) {
+          onTap(index);
+          // Navigate to chat page when chat tab is tapped (index 3)
+          if (index == 3) {
+            context.go('/chat');
+          }
+        },
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.white,
         selectedItemColor: const Color(0xFF304369),

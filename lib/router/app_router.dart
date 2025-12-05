@@ -8,6 +8,7 @@ import '../features/auth/presentation/pages/email_verification_page.dart';
 import '../features/home/presentation/pages/homepage.dart';
 import '../features/product/presentation/pages/list_product_page.dart';
 import '../features/review/presentation/pages/reviewpage.dart';
+import '../features/chat/presentation/pages/chat_overview.dart';
 
 final GoRouter appRouter = GoRouter(
   routes: [
@@ -42,6 +43,11 @@ final GoRouter appRouter = GoRouter(
       name: 'rating-reviews',
       path: '/rating-reviews',
       builder: (context, state) => const RatingReviewsPage(),
+    ),
+    GoRoute(
+      name: 'chat-overview',
+      path: '/chat',
+      builder: (context, state) => const ChatOverviewPage(),
     ),
   ],
   redirect: (context, state) {

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../domain/products.dart';
 import '../widgets/product_card.dart';
 import '../../../../core/widgets/app_header.dart';
-import '../../../../core/widgets/bottom_nav_bar.dart';
+import '../../../../core/widgets/bottom_navbar.dart';
 
 class TopRating extends StatefulWidget {
   const TopRating({super.key});
@@ -25,7 +25,7 @@ class _TopRatingState extends State<TopRating> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF7FAFE),
-      bottomNavigationBar: BottomNavBar(
+      bottomNavigationBar: PhotoKartBottomNavBar(
         currentIndex: _currentIndex,
         onTap: _onNavTap,
       ),

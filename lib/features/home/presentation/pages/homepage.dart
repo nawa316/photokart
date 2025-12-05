@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/widgets/app_header.dart';
-import '../../../../core/widgets/bottom_nav_bar.dart';
+import '../../../../core/widgets/bottom_navbar.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -55,7 +55,7 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavBar(
+      bottomNavigationBar: PhotoKartBottomNavBar(
         currentIndex: _currentIndex,
         onTap: _onNavTap,
       ),
