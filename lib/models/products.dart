@@ -22,6 +22,8 @@ class Product {
     required this.priceLabel,
     required this.gradientColors,
   });
+
+  static getById(String s) {}
 }
 
 const List<Product> products = [

@@ -96,4 +96,8 @@ class Product {
       color: const Color(0xFFEDE7F6),
     ),
   ];
+
+  static Product getById(String id) {
+    return sampleProducts.firstWhere((product) => product.id == id);
+  }
 }
