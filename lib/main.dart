@@ -1,39 +1,21 @@
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
+import 'app.dart';
 
-// import semua screen produk
-import 'ahul_product.dart';
-import 'hanni_product.dart';
-import 'karina_product.dart';
-import 'suzy_product.dart';
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Remove the # from URLs on web
+  usePathUrlStrategy();
+  
+  await dotenv.load();
 
-void main() {
-  runApp(const MyApp());
-}
+  await Supabase.initialize(
+    url: dotenv.env['SUPABASE_URL']!,
+    anonKey: dotenv.env['SUPABASE_KEY']!,
+  );
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'PhotoKart',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF7B95CF)),
-        useMaterial3: true,
-      ),
-
-      // default pertama kali yang dibuka
-      // (kalau mau ganti ke AhulProduct, tinggal ubah ke '/ahul')
-      initialRoute: '/suzy',
-
-      // daftar route sederhana untuk tiap produk
-      routes: {
-        '/ahul': (context) => const AhulProduct(),
-        '/hanni': (context) => const HanniProduct(),
-        '/karina': (context) => const KarinaProduct(),
-        '/suzy': (context) => const SuzyProduct(),
-      },
-    );
-  }
+  runApp(const PhotoKartApp());
 }
