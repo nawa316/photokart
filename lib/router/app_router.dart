@@ -62,6 +62,8 @@ final GoRouter appRouter = GoRouter(
       name: 'profile',
       path: '/profile',
       builder: (context, state) => const ProfilePage(),
+    ),
+    GoRoute(
       name: 'addproduct',
       path: '/addproduct',
       builder: (context, state) => const AddProductPage(),
