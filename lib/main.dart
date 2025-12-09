@@ -1,23 +1,21 @@
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
-import 'Screens/homepage.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
+import 'app.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Remove the # from URLs on web
+  usePathUrlStrategy();
+  
+  await dotenv.load();
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  await Supabase.initialize(
+    url: dotenv.env['SUPABASE_URL']!,
+    anonKey: dotenv.env['SUPABASE_KEY']!,
+  );
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'PhotoKart',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF7B95CF)),
-        useMaterial3: true,
-      ),
-      home: const HomePage(),
-    );
-  }
+  runApp(const PhotoKartApp());
 }
