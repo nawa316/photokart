@@ -10,7 +10,6 @@ import '../features/product/presentation/pages/top_rating.dart';
 import '../features/review/presentation/pages/reviewpage.dart';
 import '../features/chat/presentation/pages/chat_overview.dart';
 import '../features/product/presentation/pages/addproduct.dart';
-import '../features/product/presentation/pages/top_rating.dart';
 import '../features/product/presentation/pages/productpage.dart';
 
 final GoRouter appRouter = GoRouter(
