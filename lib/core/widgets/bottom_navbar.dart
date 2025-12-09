@@ -21,10 +21,23 @@ class PhotoKartBottomNavBar extends StatelessWidget {
       child: BottomNavigationBar(
         currentIndex: currentIndex,
         onTap: (index) {
-          onTap(index);
-          // Navigate to chat page when chat tab is tapped (index 3)
-          if (index == 3) {
-            context.go('/chat');
+          // Navigate based on the tapped index
+          switch (index) {
+            case 0: // Shop
+              context.go('/product'); // Replace with your shop route
+              break;
+            case 1: // Cart
+              context.go('/product'); // Replace with your cart route
+              break;
+            case 2: // Home/PhotoKart
+              context.go('/'); // Home route
+              break;
+            case 3: // Chat
+              context.go('/chat');
+              break;
+            case 4: // Profile
+              context.go('/profile'); // Replace with your profile route
+              break;
           }
         },
         type: BottomNavigationBarType.fixed,
