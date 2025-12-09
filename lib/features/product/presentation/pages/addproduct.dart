@@ -1,7 +1,43 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:image_picker/image_picker.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../../data/product_repository.dart';
 import '../widgets/product_add_header.dart';
+
+// Add this enum for rarity
+enum ProductRarity {
+  common,
+  rare,
+  very_rare,
+  ultra_rare;
+  
+  String get displayName {
+    switch (this) {
+      case ProductRarity.common:
+        return 'Common';
+      case ProductRarity.rare:
+        return 'Rare';
+      case ProductRarity.very_rare:
+        return 'Very Rare';
+      case ProductRarity.ultra_rare:
+        return 'Ultra Rare';
+    }
+  }
+  
+  static ProductRarity? fromString(String value) {
+    try {
+      return ProductRarity.values.firstWhere(
+        (e) => e.toString().split('.').last == value.toLowerCase()
+      );
+    } catch (e) {
+      return null;
+    }
+  }
+}
 
 class AddProductPage extends StatefulWidget {
   const AddProductPage({super.key});
@@ -13,6 +49,7 @@ class AddProductPage extends StatefulWidget {
 class _AddProductPageState extends State<AddProductPage> {
   XFile? _imageFile;
   final ImagePicker picker = ImagePicker();
+  final ProductRepository _repository = ProductRepository();
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController descController = TextEditingController();
@@ -20,6 +57,9 @@ class _AddProductPageState extends State<AddProductPage> {
       TextEditingController(text: "0");
   final TextEditingController priceController =
       TextEditingController(text: "Rp. 0");
+  
+  // Add rarity state variable
+  ProductRarity? _selectedRarity;
 
   Future<void> pickImage() async {
     final picked = await picker.pickImage(
@@ -30,6 +70,92 @@ class _AddProductPageState extends State<AddProductPage> {
       setState(() {
         _imageFile = picked;
       });
+    }
+  }
+
+  Future<void> _addProduct() async {
+    final name = nameController.text.trim();
+    final desc = descController.text.trim();
+    final stock = int.tryParse(stockController.text) ?? 0;
+
+    // Price parsing: remove non-digit and non-dot chars
+    final rawPrice = priceController.text;
+    final priceStr = rawPrice.replaceAll(RegExp(r'[^0-9\.]'), '');
+    final price = double.tryParse(priceStr) ?? 0.0;
+
+    if (name.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter product name')),
+      );
+      return;
+    }
+
+    if (desc.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter product description')),
+      );
+      return;
+    }
+
+    if (_imageFile == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a product image')),
+      );
+      return;
+    }
+
+    // Add validation for rarity
+    if (_selectedRarity == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select product rarity')),
+      );
+      return;
+    }
+
+    final userId = Supabase.instance.client.auth.currentUser?.id;
+    if (userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('User not authenticated')),
+      );
+      return;
+    }
+
+    // show loading
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      final Uint8List bytes = await _imageFile!.readAsBytes();
+      final fileExt = (_imageFile!.name.contains('.')
+              ? _imageFile!.name.split('.').last
+              : 'jpg')
+          .toLowerCase();
+
+      // Update repository call to include rarity
+      await _repository.createProduct(
+        name: name,
+        description: desc,
+        stock: stock,
+        price: price,
+        rarity: _selectedRarity!.name, // This will be "common", "rare", etc.
+        imageBytes: bytes,
+        fileExt: fileExt,
+        userId: userId,
+      );
+
+      Navigator.of(context).pop(); // remove loading
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Product added successfully')),
+      );
+      Navigator.of(context).pop();
+    } catch (e) {
+      Navigator.of(context).pop(); // remove loading
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to add product: $e')),
+      );
     }
   }
 
@@ -67,6 +193,45 @@ class _AddProductPageState extends State<AddProductPage> {
           borderRadius: BorderRadius.circular(14),
           borderSide:
               const BorderSide(color: Color(0xFF304369), width: 2),
+        ),
+      ),
+    );
+  }
+
+  // Add method to build rarity dropdown
+  Widget _buildRarityDropdown() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFF7B95CF)),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<ProductRarity>(
+          value: _selectedRarity,
+          isExpanded: true,
+          hint: const Text(
+            'Select rarity',
+            style: TextStyle(color: Color(0x55304369)),
+          ),
+          icon: const Icon(Icons.arrow_drop_down, color: Color(0xFF304369)),
+          style: const TextStyle(
+            fontSize: 16,
+            color: Color(0xFF304369),
+          ),
+          borderRadius: BorderRadius.circular(12),
+          items: ProductRarity.values.map((rarity) {
+            return DropdownMenuItem<ProductRarity>(
+              value: rarity,
+              child: Text(rarity.displayName),
+            );
+          }).toList(),
+          onChanged: (ProductRarity? newValue) {
+            setState(() {
+              _selectedRarity = newValue;
+            });
+          },
         ),
       ),
     );
@@ -144,10 +309,19 @@ class _AddProductPageState extends State<AddProductPage> {
                                 )
                               : ClipRRect(
                                   borderRadius: BorderRadius.circular(20),
-                                  child: Image.network(
-                                    _imageFile!.path,
-                                    fit: BoxFit.cover,
-                                  ),
+                                  child: FutureBuilder(
+                                  future: _imageFile!.readAsBytes(),
+                                  builder: (context, snapshot) {
+                                    if (!snapshot.hasData) {
+                                      return const Center(child: CircularProgressIndicator());
+                                    }
+                                    return Image.memory(
+                                      snapshot.data as Uint8List,
+                                      fit: BoxFit.cover,
+                                    );
+                                  },
+                                )
+
                                 ),
                         ),
                       ),
@@ -170,6 +344,13 @@ class _AddProductPageState extends State<AddProductPage> {
                       controller: descController,
                       hint: "Product Description",
                     ),
+
+                    SizedBox(height: h * 0.02),
+
+                    // ADD RARITY FIELD HERE
+                    _buildLabel("Rarity"),
+                    const SizedBox(height: 6),
+                    _buildRarityDropdown(),
 
                     SizedBox(height: h * 0.02),
 
@@ -246,28 +427,31 @@ class _AddProductPageState extends State<AddProductPage> {
                     SizedBox(height: h * 0.04),
 
                     Center(
-                      child: Container(
-                        width: w * 0.45,
-                        height: w * 0.12,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF7B95CF),
-                          borderRadius: BorderRadius.circular(22),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black
-                                  .withValues(alpha: 0.15),
-                              blurRadius: 8,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: Center(
-                          child: Text(
-                            "Add",
-                            style: TextStyle(
-                              fontSize: w * 0.045,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
+                      child: GestureDetector(
+                        onTap: _addProduct,
+                        child: Container(
+                          width: w * 0.45,
+                          height: w * 0.12,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF7B95CF),
+                            borderRadius: BorderRadius.circular(22),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black
+                                    .withValues(alpha: 0.15),
+                                blurRadius: 8,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child: Text(
+                              "Add",
+                              style: TextStyle(
+                                fontSize: w * 0.045,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
@@ -284,13 +468,4 @@ class _AddProductPageState extends State<AddProductPage> {
       ),
     );
   }
-}
-
-void main() {
-  runApp(
-    const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: AddProductPage(),
-    ),
-  );
 }

@@ -18,7 +18,6 @@ class _TopRatingState extends State<TopRating> {
     setState(() {
       _currentIndex = index;
     });
-    // TODO: Add navigation logic based on index
   }
 
   @override
