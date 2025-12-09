@@ -9,15 +9,22 @@ import '../features/home/presentation/pages/homepage.dart';
 import '../features/product/presentation/pages/list_product_page.dart';
 import '../features/review/presentation/pages/reviewpage.dart';
 import '../features/chat/presentation/pages/chat_overview.dart';
+import '../features/profile/presentation/pages/profile_page.dart';
 
 final GoRouter appRouter = GoRouter(
   routes: [
-    GoRoute(path: '/', builder: (context, state) => const HomePage()),
+    GoRoute(
+      path: '/',
+      builder: (context, state) => const HomePage(),
+    ),
     GoRoute(
       path: '/onboarding',
       builder: (context, state) => const OnboardingPage(),
     ),
-    GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
+    GoRoute(
+      path: '/login',
+      builder: (context, state) => const LoginPage(),
+    ),
     GoRoute(
       path: '/register',
       builder: (context, state) => const RegisterPage(),
@@ -49,6 +56,11 @@ final GoRouter appRouter = GoRouter(
       path: '/chat',
       builder: (context, state) => const ChatOverviewPage(),
     ),
+    GoRoute(
+      name: 'profile',
+      path: '/profile',
+      builder: (context, state) => const ProfilePage(),
+    ),
   ],
   redirect: (context, state) {
     final session = Supabase.instance.client.auth.currentSession;
@@ -57,8 +69,11 @@ final GoRouter appRouter = GoRouter(
       '/register',
       '/onboarding',
     ];
+
     // Allow email-verification page without session
-    final isEmailVerification = state.uri.path.startsWith('/email-verification');
+    final isEmailVerification =
+        state.uri.path.startsWith('/email-verification');
+
     if (session == null &&
         !allowedPaths.contains(state.uri.path) &&
         !isEmailVerification) {
