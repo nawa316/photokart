@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import '../../data/datasources/auth_api.dart';
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../../../core/services/supabase_service.dart';
+import 'package:flutter/gestures.dart';
+
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -115,247 +117,283 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Colored header
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0xFFE4F0FF), Color(0xFFFFEEFC)],
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 40),
-                  IconButton(
-                    onPressed: () => context.go('/onboarding'),
-                    icon: const Icon(Icons.arrow_back),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Create Account',
-                    style: TextStyle(
-                      color: Color(0xFF304369),
-                      fontSize: 32,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 40),
+Widget build(BuildContext context) {
+  final size = MediaQuery.of(context).size;
+  final w = size.width;
+  final h = size.height;
+
+  return Scaffold(
+    backgroundColor: const Color(0xFFF7FAFE),
+    body: SafeArea(
+      child: Stack(
+        children: [
+          // ===== BACKGROUND (GRADIENT) =====
+          Container(
+            width: double.infinity,
+            height: h,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xFFFFEEFC),
+                  Color(0xFFFBF4FD),
+                  Colors.white,
                 ],
               ),
             ),
+          ),
 
-            // White form card
-            Expanded(
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(24),
-                    topRight: Radius.circular(24),
-                  ),
+          // ===== BACK BUTTON + TITLE =====
+          Positioned(
+            left: w * (38 / 430),
+            top: h * (81 / 932),
+            child: IconButton(
+              onPressed: () => context.go('/onboarding'),
+              icon: const Icon(Icons.arrow_back, color: Color(0xFF304369)),
+            ),
+          ),
+          Positioned(
+            left: w * (43 / 430),
+            top: h * (125 / 932),
+            child: const Text(
+              'Create Account',
+              style: TextStyle(
+                color: Color(0xFF304369),
+                fontSize: 32,
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+
+          // ===== CARD PUTIH (FORM) =====
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              width: double.infinity,
+              height: h * 0.78,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(32),
+                  topRight: Radius.circular(32),
                 ),
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 24),
-                      const Text(
-                        'Welcome',
-                        style: TextStyle(
-                          color: Color(0xFF304369),
-                          fontSize: 24,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w600,
-                        ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Color(0x22000000),
+                    blurRadius: 20,
+                    offset: Offset(0, -4),
+                  ),
+                ],
+              ),
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(
+                  horizontal: w * (51 / 430),
+                  vertical: h * 0.03,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Welcome',
+                      style: TextStyle(
+                        color: Color(0xFF304369),
+                        fontSize: 28,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w700,
                       ),
-                      const SizedBox(height: 4),
-                      const Text(
-                        'Hello there, Create an account to continue!',
-                        style: TextStyle(
-                          color: Color(0xFF304369),
-                          fontSize: 14,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w400,
-                        ),
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'Hello there, Create an account to continue!',
+                      style: TextStyle(
+                        color: Color(0xFF304369),
+                        fontSize: 16,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w400,
                       ),
+                    ),
 
-                      const SizedBox(height: 32),
+                    SizedBox(height: h * (30 / 932)),
 
-                      // Form
-                      Form(
-                        key: _formKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Username
-                            const Text(
-                              'Username',
-                              style: TextStyle(
-                                color: Color(0xFF304369),
-                                fontSize: 14,
-                                fontFamily: 'Poppins',
-                                fontWeight: FontWeight.w500,
-                              ),
+                    // ============= FORM =============
+                    Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Username
+                          const Text(
+                            'Username ',
+                            style: TextStyle(
+                              color: Color(0xFF304369),
+                              fontSize: 12,
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w500,
                             ),
-                            const SizedBox(height: 8),
-                            TextFormField(
+                          ),
+                          const SizedBox(height: 8),
+                          SizedBox(
+                            height: 34,
+                            child: TextFormField(
                               controller: _usernameController,
                               decoration: InputDecoration(
-                                hintText: 'Your name',
+                                hintText: 'Nicholas Evan S',
                                 hintStyle: const TextStyle(
                                   color: Color(0xFFB0B0B0),
-                                  fontSize: 14,
+                                  fontSize: 12,
                                   fontFamily: 'Poppins',
                                 ),
                                 filled: true,
-                                fillColor: const Color(0xFFF5F5F5),
+                                fillColor: const Color(0xFFF6F7F9),
                                 border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                                  borderRadius: BorderRadius.circular(10),
                                   borderSide: BorderSide.none,
                                 ),
                                 contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 16,
+                                  horizontal: 14,
+                                  vertical: 8,
                                 ),
                               ),
-                              validator: (v) => (v == null || v.trim().isEmpty)
-                                  ? 'Please enter username'
-                                  : null,
+                              validator: (v) =>
+                                  (v == null || v.trim().isEmpty)
+                                      ? 'Please enter username'
+                                      : null,
                               style: const TextStyle(
                                 fontFamily: 'Poppins',
-                                fontSize: 14,
+                                fontSize: 12,
                               ),
                             ),
+                          ),
 
-                            const SizedBox(height: 20),
+                          const SizedBox(height: 16),
 
-                            // Email
-                            const Text(
-                              'Email',
-                              style: TextStyle(
-                                color: Color(0xFF304369),
-                                fontSize: 14,
-                                fontFamily: 'Poppins',
-                                fontWeight: FontWeight.w500,
-                              ),
+                          // Email
+                          const Text(
+                            'Email',
+                            style: TextStyle(
+                              color: Color(0xFF304369),
+                              fontSize: 12,
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w500,
                             ),
-                            const SizedBox(height: 8),
-                            TextFormField(
+                          ),
+                          const SizedBox(height: 8),
+                          SizedBox(
+                            height: 34,
+                            child: TextFormField(
                               controller: _emailController,
                               keyboardType: TextInputType.emailAddress,
                               decoration: InputDecoration(
                                 hintText: 'example@gmail.com',
                                 hintStyle: const TextStyle(
                                   color: Color(0xFFB0B0B0),
-                                  fontSize: 14,
+                                  fontSize: 12,
                                   fontFamily: 'Poppins',
                                 ),
                                 filled: true,
-                                fillColor: const Color(0xFFF5F5F5),
+                                fillColor: const Color(0xFFF6F7F9),
                                 border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                                  borderRadius: BorderRadius.circular(10),
                                   borderSide: BorderSide.none,
                                 ),
                                 contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 16,
+                                  horizontal: 14,
+                                  vertical: 8,
                                 ),
                               ),
-                              validator: (v) => (v == null || v.trim().isEmpty)
-                                  ? 'Please enter email'
-                                  : null,
+                              validator: (v) =>
+                                  (v == null || v.trim().isEmpty)
+                                      ? 'Please enter email'
+                                      : null,
                               style: const TextStyle(
                                 fontFamily: 'Poppins',
-                                fontSize: 14,
+                                fontSize: 12,
                               ),
                             ),
+                          ),
 
-                            const SizedBox(height: 20),
+                          const SizedBox(height: 16),
 
-                            // Phone Number
-                            const Text(
-                              'Phone Number',
-                              style: TextStyle(
-                                color: Color(0xFF304369),
-                                fontSize: 14,
-                                fontFamily: 'Poppins',
-                                fontWeight: FontWeight.w500,
-                              ),
+                          // Phone
+                          const Text(
+                            'Phone Number',
+                            style: TextStyle(
+                              color: Color(0xFF304369),
+                              fontSize: 12,
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w500,
                             ),
-                            const SizedBox(height: 8),
-                            TextFormField(
+                          ),
+                          const SizedBox(height: 8),
+                          SizedBox(
+                            height: 34,
+                            child: TextFormField(
                               controller: _phoneController,
                               keyboardType: TextInputType.phone,
                               decoration: InputDecoration(
-                                hintText: '08xxxxxxxxxx',
+                                hintText: '081232120897',
                                 hintStyle: const TextStyle(
                                   color: Color(0xFFB0B0B0),
-                                  fontSize: 14,
+                                  fontSize: 12,
                                   fontFamily: 'Poppins',
                                 ),
                                 filled: true,
-                                fillColor: const Color(0xFFF5F5F5),
+                                fillColor: const Color(0xFFF6F7F9),
                                 border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                                  borderRadius: BorderRadius.circular(10),
                                   borderSide: BorderSide.none,
                                 ),
                                 contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 16,
+                                  horizontal: 14,
+                                  vertical: 8,
                                 ),
                               ),
-                              validator: (v) => (v == null || v.trim().isEmpty)
-                                  ? 'Please enter phone number'
-                                  : null,
+                              validator: (v) =>
+                                  (v == null || v.trim().isEmpty)
+                                      ? 'Please enter phone number'
+                                      : null,
                               style: const TextStyle(
                                 fontFamily: 'Poppins',
-                                fontSize: 14,
+                                fontSize: 12,
                               ),
                             ),
+                          ),
 
-                            const SizedBox(height: 20),
+                          const SizedBox(height: 16),
 
-                            // Role Selection
-                            const Text(
-                              'I want to',
-                              style: TextStyle(
-                                color: Color(0xFF304369),
-                                fontSize: 14,
-                                fontFamily: 'Poppins',
-                                fontWeight: FontWeight.w500,
-                              ),
+                          // I want to (role)
+                          const Text(
+                            'I want to',
+                            style: TextStyle(
+                              color: Color(0xFF304369),
+                              fontSize: 12,
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w500,
                             ),
-                            const SizedBox(height: 8),
-                            DropdownButtonFormField<String>(
+                          ),
+                          const SizedBox(height: 8),
+                          SizedBox(
+                            height: 34,
+                            child: DropdownButtonFormField<String>(
                               value: _selectedRole,
                               decoration: InputDecoration(
                                 filled: true,
-                                fillColor: const Color(0xFFF5F5F5),
+                                fillColor: const Color(0xFFF6F7F9),
                                 border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                                  borderRadius: BorderRadius.circular(10),
                                   borderSide: BorderSide.none,
                                 ),
                                 contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 16,
+                                  horizontal: 14,
+                                  vertical: 4,
                                 ),
                               ),
                               style: const TextStyle(
                                 fontFamily: 'Poppins',
-                                fontSize: 14,
+                                fontSize: 12,
                                 color: Color(0xFF304369),
                               ),
                               icon: const Icon(
@@ -384,39 +422,42 @@ class _RegisterPageState extends State<RegisterPage> {
                                 }
                               },
                             ),
+                          ),
 
-                            const SizedBox(height: 20),
+                          const SizedBox(height: 16),
 
-                            // Password
-                            const Text(
-                              'Password',
-                              style: TextStyle(
-                                color: Color(0xFF304369),
-                                fontSize: 14,
-                                fontFamily: 'Poppins',
-                                fontWeight: FontWeight.w500,
-                              ),
+                          // Password
+                          const Text(
+                            'Password',
+                            style: TextStyle(
+                              color: Color(0xFF304369),
+                              fontSize: 12,
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w500,
                             ),
-                            const SizedBox(height: 8),
-                            TextFormField(
+                          ),
+                          const SizedBox(height: 8),
+                          SizedBox(
+                            height: 34,
+                            child: TextFormField(
                               controller: _passwordController,
                               obscureText: _obscurePassword,
                               decoration: InputDecoration(
-                                hintText: '••••••••••••',
+                                hintText: '*****************',
                                 hintStyle: const TextStyle(
                                   color: Color(0xFFB0B0B0),
-                                  fontSize: 14,
+                                  fontSize: 12,
                                   fontFamily: 'Poppins',
                                 ),
                                 filled: true,
-                                fillColor: const Color(0xFFF5F5F5),
+                                fillColor: const Color(0xFFF6F7F9),
                                 border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                                  borderRadius: BorderRadius.circular(10),
                                   borderSide: BorderSide.none,
                                 ),
                                 contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 16,
+                                  horizontal: 14,
+                                  vertical: 8,
                                 ),
                                 suffixIcon: IconButton(
                                   icon: Icon(
@@ -433,47 +474,51 @@ class _RegisterPageState extends State<RegisterPage> {
                                   },
                                 ),
                               ),
-                              validator: (v) => (v == null || v.length < 6)
-                                  ? 'Min 6 characters'
-                                  : null,
+                              validator: (v) =>
+                                  (v == null || v.length < 6)
+                                      ? 'Min 6 characters'
+                                      : null,
                               style: const TextStyle(
                                 fontFamily: 'Poppins',
-                                fontSize: 14,
+                                fontSize: 12,
                               ),
                             ),
+                          ),
 
-                            const SizedBox(height: 20),
+                          const SizedBox(height: 16),
 
-                            // Confirm Password
-                            const Text(
-                              'Confirm Password',
-                              style: TextStyle(
-                                color: Color(0xFF304369),
-                                fontSize: 14,
-                                fontFamily: 'Poppins',
-                                fontWeight: FontWeight.w500,
-                              ),
+                          // Confirm Password
+                          const Text(
+                            'Confirm Password',
+                            style: TextStyle(
+                              color: Color(0xFF304369),
+                              fontSize: 12,
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w500,
                             ),
-                            const SizedBox(height: 8),
-                            TextFormField(
+                          ),
+                          const SizedBox(height: 8),
+                          SizedBox(
+                            height: 34,
+                            child: TextFormField(
                               controller: _confirmPasswordController,
                               obscureText: _obscureConfirmPassword,
                               decoration: InputDecoration(
-                                hintText: '••••••••••••',
+                                hintText: '*****************',
                                 hintStyle: const TextStyle(
                                   color: Color(0xFFB0B0B0),
-                                  fontSize: 14,
+                                  fontSize: 12,
                                   fontFamily: 'Poppins',
                                 ),
                                 filled: true,
-                                fillColor: const Color(0xFFF5F5F5),
+                                fillColor: const Color(0xFFF6F7F9),
                                 border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                                  borderRadius: BorderRadius.circular(10),
                                   borderSide: BorderSide.none,
                                 ),
                                 contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 16,
+                                  horizontal: 14,
+                                  vertical: 8,
                                 ),
                                 suffixIcon: IconButton(
                                   icon: Icon(
@@ -502,54 +547,53 @@ class _RegisterPageState extends State<RegisterPage> {
                               },
                               style: const TextStyle(
                                 fontFamily: 'Poppins',
-                                fontSize: 14,
+                                fontSize: 12,
                               ),
                             ),
+                          ),
 
-                            const SizedBox(height: 24),
+                          SizedBox(height: h * (24 / 932)),
 
-                            // Error message
-                            if (_errorMessage != null)
-                              Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: Colors.red.shade50,
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                    color: Colors.red.shade200,
-                                  ),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.error_outline,
-                                      color: Colors.red.shade700,
-                                      size: 20,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: Text(
-                                        _errorMessage!,
-                                        style: TextStyle(
-                                          color: Colors.red.shade700,
-                                          fontSize: 12,
-                                          fontFamily: 'Poppins',
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                          // Error message
+                          if (_errorMessage != null) ...[
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.red.shade50,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: Colors.red.shade200,
                                 ),
                               ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.error_outline,
+                                    color: Colors.red.shade700,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      _errorMessage!,
+                                      style: TextStyle(
+                                        color: Colors.red.shade700,
+                                        fontSize: 12,
+                                        fontFamily: 'Poppins',
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                          ],
 
-                            if (_errorMessage != null)
-                              const SizedBox(height: 16),
-
-                            const SizedBox(height: 8),
-
-                            // Create Button
-                            SizedBox(
-                              width: double.infinity,
-                              height: 48,
+                          // Button Create
+                          Center(
+                            child: SizedBox(
+                              width: w * (250 / 430),
+                              height: 52,
                               child: ElevatedButton(
                                 onPressed: _isLoading ? null : _handleRegister,
                                 style: ElevatedButton.styleFrom(
@@ -580,51 +624,55 @@ class _RegisterPageState extends State<RegisterPage> {
                                       ),
                               ),
                             ),
+                          ),
 
-                            const SizedBox(height: 24),
+                          const SizedBox(height: 16),
 
-                            // Already have account
-                            Center(
-                              child: RichText(
-                                text: TextSpan(
-                                  style: const TextStyle(
-                                    fontFamily: 'Poppins',
-                                    fontSize: 14,
-                                    color: Color(0xFF304369),
-                                  ),
-                                  children: [
-                                    const TextSpan(
-                                      text: 'Already have an account? ',
-                                    ),
-                                    WidgetSpan(
-                                      child: GestureDetector(
-                                        onTap: () => context.go('/login'),
-                                        child: const Text(
-                                          'Sign in',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            color: Color(0xFF7B95CF),
-                                            fontFamily: 'Poppins',
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                          // ===== Already have account (DI DALAM CARD) =====
+                          Center(
+                            child: RichText(
+                              textAlign: TextAlign.center,
+                              text: TextSpan(
+                                style: const TextStyle(
+                                  color: Color(0xFF304369),
+                                  fontSize: 14,
+                                  fontFamily: 'Poppins',
                                 ),
+                                children: [
+                                  const TextSpan(
+                                    text: 'Already have an account? ',
+                                  ),
+                                  TextSpan(
+                                    text: 'Sign in',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFF304369),
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () => context.go('/login'),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+
+
+                          SizedBox(height: h * 0.015),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+
+          // >>> TIDAK ADA Positioned "Already have an account" DI SINI LAGI <<<
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
+
 }
