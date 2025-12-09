@@ -106,7 +106,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                     color: Color(0xFF304369),
                     fontSize: 28,
                     fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w600,
                     height: 1.5,
                   ),
                 ),
@@ -145,7 +145,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                     color: Color(0xFF304369),
                     fontSize: 28,
                     fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w600,
                     height: 1.5,
                   ),
                 ),
@@ -160,175 +160,211 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   // ====== PAGE 3: SIGN IN OPTIONS ======
   Widget _buildPage3(Size size) {
-    return Column(
-      children: [
-        const SizedBox(height: 24),
-        Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(
-                height: size.height * 0.35,
-                child: Image.asset(
-                  'assets/images/wanita_keranjang.png',
-                  fit: BoxFit.contain,
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 32),
-                child: Text(
-                  'Ready to Start Your\nCollection?',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Color(0xFF304369),
-                    fontSize: 28,
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w500,
-                    height: 1.5,
+    final h = size.height;
+    final w = size.width;
+
+    return Padding(
+      padding: EdgeInsets.only(
+        top: h * 0.03,
+        bottom: h * 0.02,
+      ),
+      child: Column(
+        children: [
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // gambar sekitar 35% tinggi layar
+                SizedBox(
+                  height: h * 0.35,
+                  child: Image.asset(
+                    'assets/images/wanita_keranjang.png',
+                    fit: BoxFit.contain,
                   ),
                 ),
-              ),
-            ],
+                SizedBox(height: h * 0.02),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: w * 0.14),
+                  child: Text(
+                    'Ready to Start Your\nCollection?',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: const Color(0xFF304369),
+                      fontSize: 28,        // 7% lebar layar (≈ 26–30px)
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w600,
+                      height: 1.4,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-        const SizedBox(height: 16),
-      ],
+        ],
+      ),
     );
   }
 
   // ====== BUTTONS ======
   Widget _buildButtons() {
-    if (_currentPage == 2) {
-      // Page 3: Google Sign In + Create Account + Sign In Text
-      return Column(
-        children: [
-          // Google Sign In Button
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32),
-            child: SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton(
-                onPressed: () {
-                  // TODO: handle Google sign-in
-                },
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.zero,
-                  backgroundColor: Colors.white,
-                  elevation: 4,
-                  shadowColor: Colors.black26,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(40),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // ...icon dan teks Google Sign In...
-                  ],
+  final size = MediaQuery.of(context).size;
+  final h = size.height;
+  final w = size.width;
+
+  if (_currentPage == 2) {
+    // Page 3: Google Sign In + Create Account + Sign In Text
+    return Column(
+      children: [
+        // Google Sign In Button
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: w * 0.08),
+          child: SizedBox(
+            width: double.infinity,
+            height: h * 0.055, // SAMA dengan Create Account
+            child: ElevatedButton(
+              onPressed: () {
+                // TODO: handle Google sign-in
+              },
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.zero,
+                backgroundColor: Colors.white,
+                elevation: 4,
+                shadowColor: Colors.black26,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(40),
                 ),
               ),
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          // Create Account Button
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32),
-            child: SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton(
-                onPressed: () {
-                  context.go('/register');
-                },
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.zero,
-                  backgroundColor: const Color(0xFF7B95CF),
-                  elevation: 4,
-                  shadowColor: Colors.black38,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(40),
-                  ),
-                ),
-                child: const Text(
-                  'Create Account',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // Sign In Text
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: RichText(
-              text: TextSpan(
-                style: const TextStyle(
-                  color: Color(0xFF304369),
-                  fontSize: 14,
-                  fontFamily: 'Poppins',
-                ),
+              child: Stack(
+                alignment: Alignment.center,
                 children: [
-                  const TextSpan(text: 'Already have an account? '),
-                  TextSpan(
-                    text: 'Sign In',
-                    style: const TextStyle(
-                      color: Color(0xFF7B95CF),
-                      fontWeight: FontWeight.bold,
-                      decoration: TextDecoration.underline,
+                  // TEKS TETAP DI TENGAH
+                  const Center(
+                    child: Text(
+                      'Sign in with google',
+                      style: TextStyle(
+                        color: Color(0xFF7B95CF),
+                        fontSize: 16,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () {
-                        context.go('/login');
-                      },
+                  ),
+                  // IKON DI KIRI
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 20),
+                      child: Image.asset(
+                        'assets/images/google.png',
+                        height: 22,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
           ),
-          const SizedBox(height: 8),
-        ],
-      );
-    } else {
-      // Page 1 & 2: Start/Next Button
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 52),
-        child: SizedBox(
-          width: double.infinity,
-          height: 48,
-          child: ElevatedButton(
-            onPressed: _nextPage,
-            style: ElevatedButton.styleFrom(
-              padding: EdgeInsets.zero,
-              backgroundColor: const Color(0xFF7B95CF),
-              elevation: 4,
-              shadowColor: Colors.black38,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(40),
+        ),
+        SizedBox(height: h * 0.015),
+
+        // Create Account Button (BIARKAN seperti sebelumnya)
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: w * 0.08),
+          child: SizedBox(
+            width: double.infinity,
+            height: h * 0.055,
+            child: ElevatedButton(
+              onPressed: () {
+                context.go('/register');
+              },
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.zero,
+                backgroundColor: const Color(0xFF7B95CF),
+                elevation: 4,
+                shadowColor: Colors.black38,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(40),
+                ),
               ),
-            ),
-            child: Text(
-              _currentPage == 0 ? 'Start' : 'Next',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.w600,
+              child: const Text(
+                'Create an account',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ),
         ),
-      );
-    }
+        SizedBox(height: h * 0.02),
+
+        // Sign In Text
+        Padding(
+          padding: EdgeInsets.only(bottom: h * 0.015),
+          child: RichText(
+            text: TextSpan(
+              style: const TextStyle(
+                color: Color(0xFF304369),
+                fontSize: 14,
+                fontFamily: 'Poppins',
+              ),
+              children: [
+                const TextSpan(text: 'Already have an account? '),
+                TextSpan(
+                  text: 'Sign in',
+                  style: const TextStyle(
+                    color: Color(0xFF304369),
+                    fontWeight: FontWeight.w600,
+                  ),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () {
+                      context.go('/login');
+                    },
+                ),
+              ],
+            ),
+          ),
+        ),
+        SizedBox(height: h * 0.01),
+      ],
+    );
+  } else {
+    // Page 1 & 2: Start/Next Button
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: w * 0.13),
+      child: SizedBox(
+        width: double.infinity,
+        height: h * 0.055,
+        child: ElevatedButton(
+          onPressed: _nextPage,
+          style: ElevatedButton.styleFrom(
+            padding: EdgeInsets.zero,
+            backgroundColor: const Color(0xFF7B95CF),
+            elevation: 4,
+            shadowColor: Colors.black38,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(40),
+            ),
+          ),
+          child: Text(
+            _currentPage == 0 ? 'Start' : 'Next',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ),
+    );
   }
+}
+
+
 
   // ====== PAGE INDICATOR ======
   Widget _buildPageIndicator() {

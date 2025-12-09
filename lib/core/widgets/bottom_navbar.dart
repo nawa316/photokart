@@ -13,46 +13,113 @@ class PhotoKartBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final h = size.height;
+
+    // skala dari desain 39x39 dan 58x58
+    final smallIconSize = h * (39 / 932);
+    final bigIconSize   = h * (58 / 932);
+
     return ClipRRect(
       borderRadius: const BorderRadius.only(
         topLeft: Radius.circular(21),
         topRight: Radius.circular(21),
       ),
-      child: BottomNavigationBar(
-        currentIndex: currentIndex,
-        onTap: (index) {
-          onTap(index);
-          // Navigate to chat page when chat tab is tapped (index 3)
-          if (index == 3) {
-            context.go('/chat');
-          }
-        },
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        selectedItemColor: const Color(0xFF304369),
-        unselectedItemColor: const Color(0xFFB0B7D0),
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_bag_outlined),
-            label: 'Shop',
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.10),
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(21),
+            topRight: Radius.circular(21),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart_outlined),
-            label: 'Cart',
+          border: Border.all(
+            width: 1,
+            color: Colors.white,
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_basket),
-            label: 'PhotoKart',
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x26000000),
+              blurRadius: 48,
+              offset: Offset(-0.60, 0.60),
+              spreadRadius: -12,
+            ),
+          ],
+        ),
+        child: SafeArea(
+          top: false,
+          child: BottomNavigationBar(
+            backgroundColor: Colors.white,
+            type: BottomNavigationBarType.fixed,
+            currentIndex: currentIndex,
+            selectedItemColor: const Color(0xFF304369),
+            unselectedItemColor: const Color(0xFFB0B7D0),
+            showSelectedLabels: false,
+            showUnselectedLabels: false,
+            onTap: (index) {
+              onTap(index);
+              if (index == 3) {
+                context.go('/chat');
+              }
+            },
+            items: [
+              BottomNavigationBarItem(
+                label: 'Shop',
+                icon: SizedBox(
+                  width: smallIconSize,
+                  height: smallIconSize,
+                  child: Image.asset(
+                    'assets/images/bag.png',
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+              BottomNavigationBarItem(
+                label: 'Cart',
+                icon: SizedBox(
+                  width: smallIconSize,
+                  height: smallIconSize,
+                  child: Image.asset(
+                    'assets/images/cart.png',
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+              BottomNavigationBarItem(
+                label: 'PhotoKart',
+                icon: SizedBox(
+                  width: bigIconSize,
+                  height: bigIconSize,
+                  child: Image.asset(
+                    'assets/images/center_clicked.png',
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+              BottomNavigationBarItem(
+                label: 'Chat',
+                icon: SizedBox(
+                  width: smallIconSize,
+                  height: smallIconSize,
+                  child: Image.asset(
+                    'assets/images/chat.png',
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+              BottomNavigationBarItem(
+                label: 'Profile',
+                icon: SizedBox(
+                  width: smallIconSize,
+                  height: smallIconSize,
+                  child: Image.asset(
+                    'assets/images/profile.png',
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+            ],
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat_bubble_outline),
-            label: 'Chat',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            label: 'Profile',
-          ),
-        ],
+        ),
       ),
     );
   }
