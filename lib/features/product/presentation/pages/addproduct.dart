@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../components/product_add_header.dart';
+import '../widgets/product_add_header.dart';
 
 class AddProductPage extends StatefulWidget {
   const AddProductPage({super.key});

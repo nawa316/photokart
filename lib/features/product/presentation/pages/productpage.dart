@@ -1,17 +1,31 @@
 import 'package:flutter/material.dart';
-import '../components/bottom_nav.dart';
-import '../components/product_list_header.dart';
-import '../components/product_card.dart';
-import '../models/products.dart';
+import '../../../../core/widgets/bottom_navbar.dart';
+import '../widgets/product_list_header.dart';
+import '../widgets/product_card_new.dart';
+import '../../../../models/products.dart';
 
-class ProductPage extends StatelessWidget {
+class ProductPage extends StatefulWidget {
   const ProductPage({super.key});
+
+  @override
+  State<ProductPage> createState() => _ProductPageState();
+}
+
+class _ProductPageState extends State<ProductPage> {
+  int _currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF7FAFE),
-      bottomNavigationBar: const BottomNav(),
+      bottomNavigationBar: PhotoKartBottomNavBar(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+      ),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
