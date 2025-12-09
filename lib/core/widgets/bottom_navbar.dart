@@ -57,8 +57,23 @@ class PhotoKartBottomNavBar extends StatelessWidget {
             showUnselectedLabels: false,
             onTap: (index) {
               onTap(index);
-              if (index == 3) {
-                context.go('/chat');
+               // Navigate based on the tapped index
+              switch (index) {
+                case 0: // Shop
+                  context.go('/product'); // Replace with your shop route
+                  break;
+                case 1: // Cart
+                  context.go('/product'); // Replace with your cart route
+                  break;
+                case 2: // Home/PhotoKart
+                  context.go('/'); // Home route
+                  break;
+                case 3: // Chat
+                  context.go('/chat');
+                  break;
+                case 4: // Profile
+                  context.go('/profile'); // Replace with your profile route
+                  break;
               }
             },
             items: [
