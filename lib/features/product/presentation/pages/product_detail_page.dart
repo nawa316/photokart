@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../domain/products.dart';
 import 'edit_product_page.dart';
+import '../../presentation/widgets/custom_popup.dart';
+
 
 class ProductDetailPage extends StatelessWidget {
   final Product product;
@@ -142,9 +144,15 @@ class ProductDetailPage extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
+                        onPressed: () async {
+                          final isConfirm = await AppPopup.showDeleteConfirm(context);
+
+                          if (isConfirm == true) {
+                            Navigator.pop(context);
+                            await Future.delayed(Duration(milliseconds: 200));
+                            AppPopup.showDeleteSuccess(context);
+                          }
+                        },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xffFF7272),
                         shape: RoundedRectangleBorder(
