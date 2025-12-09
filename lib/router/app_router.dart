@@ -6,9 +6,11 @@ import '../features/auth/presentation/pages/login_page.dart';
 import '../features/auth/presentation/pages/register_page.dart';
 import '../features/auth/presentation/pages/email_verification_page.dart';
 import '../features/home/presentation/pages/homepage.dart';
-import '../features/product/presentation/pages/list_product_page.dart';
+import '../features/product/presentation/pages/top_rating.dart';
 import '../features/review/presentation/pages/reviewpage.dart';
 import '../features/chat/presentation/pages/chat_overview.dart';
+import '../features/product/presentation/pages/addproduct.dart';
+import '../features/product/presentation/pages/productpage.dart';
 
 final GoRouter appRouter = GoRouter(
   routes: [
@@ -41,13 +43,28 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       name: 'rating-reviews',
-      path: '/rating-reviews',
+      path: '/reviews',
       builder: (context, state) => const RatingReviewsPage(),
     ),
     GoRoute(
       name: 'chat-overview',
       path: '/chat',
       builder: (context, state) => const ChatOverviewPage(),
+    ),
+    GoRoute(
+      name: 'addproduct',
+      path: '/addproduct',
+      builder: (context, state) => const AddProductPage(),
+    ),
+    GoRoute(
+      name: 'toprating',
+      path: '/toprating',
+      builder: (context, state) => const TopRating(),
+    ),
+    GoRoute(
+      name: 'product',
+      path: '/product',
+      builder: (context, state) => const ProductPage(),
     ),
   ],
   redirect: (context, state) {
