@@ -383,7 +383,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ? const Center(child: Text('No profile data'))
                       : SingleChildScrollView(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 24, vertical: 24),
+                              horizontal: 24, vertical: 20),
                           child: Column(
                             children: [
                               _ProfileHeaderCard(
@@ -391,45 +391,42 @@ class _ProfilePageState extends State<ProfilePage> {
                                 imageProvider:
                                     _buildAvatarImage(_profile!.avatarPath),
                               ),
-                              const SizedBox(height: 24),
+                              const SizedBox(height: 20),
                               _MenuItemCard(
                                 icon: Icons.person_outline,
                                 title: 'Account',
                                 onTap: _openEditProfile,
                               ),
-                              const SizedBox(height: 16),
+                              const SizedBox(height: 12),
                               _MenuItemCard(
                                 icon: Icons.attach_money,
                                 title: 'Revenue',
                                 onTap: () {},
                               ),
-                              const SizedBox(height: 16),
+                              const SizedBox(height: 12),
                               _MenuItemCard(
-                                icon: Icons.storage_outlined,
+                                icon: Icons.delete_outline,
                                 title: 'Delete Account',
                                 showBadge: false,
                                 onTap: _showDeleteAccountDialog,
                               ),
-                              const SizedBox(height: 16),
+                              const SizedBox(height: 12),
                               _MenuItemCard(
                                 icon: Icons.exit_to_app,
                                 title: 'Exit Account',
                                 onTap: _showExitAccountDialog,
                               ),
-                              const SizedBox(height: 16),
+                              const SizedBox(height: 12),
                               _MenuItemCard(
-                                icon: Icons.group_outlined,
+                                icon: Icons.account_balance_outlined,
+                                title: 'Bank Account',
+                                onTap: () {},
+                              ),
+                              const SizedBox(height: 12),
+                              _MenuItemCard(
+                                icon: Icons.swap_horiz,
                                 title: 'Switch Role',
                                 onTap: _openSwitchRolePage,
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Current role: $_currentRole',
-                                style: const TextStyle(
-                                  color: Color(0xFF304369),
-                                  fontSize: 12,
-                                  fontFamily: 'Poppins',
-                                ),
                               ),
                               const SizedBox(height: 32),
                             ],
@@ -459,34 +456,19 @@ class _ProfileHeaderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 100,
+      height: 80,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        gradient: const LinearGradient(
-          colors: [Color(0xFFDDEEFF), Color(0xFFEAF4FF)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x337B95CF),
-            blurRadius: 18,
-            offset: Offset(0, 6),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(16),
+        color: const Color(0xFFD9EEFF),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       child: Row(
         children: [
           Container(
             width: 56,
             height: 56,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(
-                color: const Color(0xFF7B95CF),
-                width: 2,
-              ),
             ),
             child: ClipOval(
               child: Image(
@@ -503,7 +485,7 @@ class _ProfileHeaderCard extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 color: Color(0xFF304369),
-                fontSize: 18,
+                fontSize: 16,
                 fontFamily: 'Poppins',
                 fontWeight: FontWeight.w600,
               ),
@@ -531,69 +513,30 @@ class _MenuItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 68,
+      height: 60,
       child: InkWell(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(14),
         onTap: onTap,
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18),
-            gradient: const LinearGradient(
-              colors: [Color(0xFFE3F2FF), Color(0xFFF0F7FF)],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            ),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x1A7B95CF),
-                blurRadius: 12,
-                offset: Offset(0, 4),
-              ),
-            ],
+            borderRadius: BorderRadius.circular(14),
+            color: const Color(0xFFD9EEFF),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Row(
             children: [
-              Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF304369).withOpacity(0.08),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      icon,
-                      size: 18,
-                      color: const Color(0xFF304369),
-                    ),
-                  ),
-                  if (showBadge)
-                    Positioned(
-                      right: -2,
-                      top: -2,
-                      child: Container(
-                        width: 14,
-                        height: 14,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFE53935),
-                          shape: BoxShape.circle,
-                        ),
-                        alignment: Alignment.center,
-                        child: const Text(
-                          '1',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 9,
-                            fontFamily: 'Poppins',
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF304369).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  icon,
+                  size: 22,
+                  color: const Color(0xFF304369),
+                ),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -601,7 +544,7 @@ class _MenuItemCard extends StatelessWidget {
                   title,
                   style: const TextStyle(
                     color: Color(0xFF304369),
-                    fontSize: 16,
+                    fontSize: 15,
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.w500,
                   ),
@@ -610,6 +553,7 @@ class _MenuItemCard extends StatelessWidget {
               const Icon(
                 Icons.chevron_right,
                 color: Color(0xFF304369),
+                size: 24,
               ),
             ],
           ),

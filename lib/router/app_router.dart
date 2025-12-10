@@ -15,6 +15,7 @@ import '../features/product/presentation/pages/addproduct.dart';
 import '../features/product/presentation/pages/productpage.dart';
 import '../features/product/presentation/pages/edit_product_page.dart';
 import '../features/product/presentation/pages/product_detail_page.dart';
+import '../features/order/presentation/pages/order_list_page.dart';
 
 final GoRouter appRouter = GoRouter(
   routes: [
@@ -80,6 +81,11 @@ final GoRouter appRouter = GoRouter(
       name: 'product',
       path: '/product',
       builder: (context, state) => const ProductPage(),
+    ),
+    GoRoute(
+      name: 'order',
+      path: '/order',
+      builder: (context, state) => const OrderListPage(),
     ),
     GoRoute(
       name: 'product-detail',
