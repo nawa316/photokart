@@ -63,7 +63,7 @@ class PhotoKartBottomNavBar extends StatelessWidget {
                   context.go('/product'); // Replace with your shop route
                   break;
                 case 1: // Cart
-                  context.go('/product'); // Replace with your cart route
+                  context.go('/order'); // Replace with your cart route
                   break;
                 case 2: // Home/PhotoKart
                   context.go('/'); // Home route
