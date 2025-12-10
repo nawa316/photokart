@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../domain/products.dart';
+import '../../../../models/products.dart';
 
 
 class EditProductPage extends StatefulWidget {
@@ -22,7 +22,12 @@ class _EditProductPageState extends State<EditProductPage> {
     nameCtrl = TextEditingController(text: widget.product.name);
     descCtrl = TextEditingController(text: widget.product.description);
     stockCtrl = TextEditingController(text: widget.product.stock.toString());
-    priceCtrl = TextEditingController(text: widget.product.price.toString());
+    // Extract numeric price from priceLabel (e.g., "RP. 120.000,00" -> "120000")
+    final priceString = widget.product.priceLabel
+        .replaceAll('RP. ', '')
+        .replaceAll('.', '')
+        .replaceAll(',00', '');
+    priceCtrl = TextEditingController(text: priceString);
   }
 
   @override
@@ -119,19 +124,26 @@ class _EditProductPageState extends State<EditProductPage> {
                       borderRadius: BorderRadius.circular(18)),
                 ),
                 onPressed: () {
+                  // Format price to Indonesian Rupiah format
+                  final price = double.parse(priceCtrl.text);
+                  final formattedPrice = 'RP. ${price.toStringAsFixed(0).replaceAllMapped(
+                    RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+                    (Match m) => '${m[1]}.',
+                  )},00';
+                  
                   Navigator.pop(
                     context,
                     Product(
                       id: widget.product.id,
                       name: nameCtrl.text,
                       description: descCtrl.text,
-                      price: double.parse(priceCtrl.text),
+                      priceLabel: formattedPrice,
                       stock: int.parse(stockCtrl.text),
                       sales: widget.product.sales,
                       rating: widget.product.rating,
                       reviewCount: widget.product.reviewCount,
                       image: widget.product.image,
-                      color: widget.product.color,
+                      gradientColors: widget.product.gradientColors,
                     ),
                   );
                 },

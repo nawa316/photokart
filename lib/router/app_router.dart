@@ -81,6 +81,18 @@ final GoRouter appRouter = GoRouter(
       path: '/product',
       builder: (context, state) => const ProductPage(),
     ),
+    GoRoute(
+      name: 'product-detail',
+      path: '/product/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'] ?? '';
+        final product = products.firstWhere(
+          (p) => p.id == id,
+          orElse: () => products.first,
+        );
+        return ProductDetailPage(product: product);
+      },
+    ),
   ],
   redirect: (context, state) {
     final session = Supabase.instance.client.auth.currentSession;

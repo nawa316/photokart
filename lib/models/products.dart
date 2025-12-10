@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Product {
+  final String id;
   final String name;
   final String description;
   final String image;
@@ -12,6 +13,7 @@ class Product {
   final List<Color> gradientColors;
 
   const Product({
+    required this.id,
     required this.name,
     required this.description,
     required this.image,
@@ -23,11 +25,19 @@ class Product {
     required this.gradientColors,
   });
 
-  static getById(String s) {}
+  String get formattedPrice => priceLabel;
+
+  static getById(String id) {
+    return products.firstWhere(
+      (p) => p.id == id,
+      orElse: () => products.first,
+    );
+  }
 }
 
 const List<Product> products = [
   Product(
+    id: '1',
     name: 'Hanni Bengong',
     description: 'Photocard Rare',
     image: 'assets/images/hanni.png',
@@ -42,6 +52,7 @@ const List<Product> products = [
     ],
   ),
   Product(
+    id: '2',
     name: 'Suzi',
     description: 'Photocard Rare',
     image: 'assets/images/suzi.png',
@@ -56,6 +67,7 @@ const List<Product> products = [
     ],
   ),
   Product(
+    id: '3',
     name: 'Karina Dagu',
     description: 'Photocard Rare',
     image: 'assets/images/karina.png',
@@ -70,6 +82,7 @@ const List<Product> products = [
     ],
   ),
   Product(
+    id: '4',
     name: 'Ahul IndoKor',
     description: 'Photocard Rare',
     image: 'assets/images/ahul.png',

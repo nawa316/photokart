@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../domain/products.dart';
+import '../../../../models/products.dart';
 import 'edit_product_page.dart';
 import '../../presentation/widgets/custom_popup.dart';
 
