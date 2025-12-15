@@ -18,15 +18,24 @@ class OrderListProvider with ChangeNotifier {
   List<Transaction> _transactions = [];
   String? _errorMessage;
   bool _isBuySelected = true;
+  String _searchQuery = '';
 
   OrderListState get state => _state;
   List<Transaction> get transactions => _transactions;
   String? get errorMessage => _errorMessage;
   bool get isBuySelected => _isBuySelected;
+  String get searchQuery => _searchQuery;
 
   List<Transaction> get filteredTransactions {
-    // Transactions are already filtered by the repository based on type
-    return _transactions;
+    if (_searchQuery.isEmpty) return _transactions;
+    final query = _searchQuery.toLowerCase();
+    return _transactions.where((t) {
+      final idMatch = t.id.toLowerCase().contains(query) ||
+          t.id.substring(0, 8).toLowerCase().contains(query);
+      final nameMatch = (t.productName ?? '').toLowerCase().contains(query);
+      final statusMatch = t.statusDisplay.toLowerCase().contains(query);
+      return idMatch || nameMatch || statusMatch;
+    }).toList();
   }
 
   Future<void> toggleTransactionType(bool isBuy, String userId) async {
@@ -34,6 +43,11 @@ class OrderListProvider with ChangeNotifier {
     _isBuySelected = isBuy;
     // Reload transactions with new type
     await loadTransactions(userId);
+  }
+
+  void setSearchQuery(String query) {
+    _searchQuery = query;
+    notifyListeners();
   }
 
   Future<void> loadTransactions(String userId) async {

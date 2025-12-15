@@ -19,6 +19,7 @@ import '../features/product/data/product_repository.dart';
 import '../features/order/presentation/pages/order_list_page.dart';
 import '../features/order/presentation/pages/order_detail_page.dart';
 import '../features/product/domain/product_model.dart';
+import '../features/revenue/presentation/pages/revenue_page.dart';
 
 final GoRouter appRouter = GoRouter(
   routes: [
@@ -109,6 +110,11 @@ final GoRouter appRouter = GoRouter(
           quantity: quantity != null ? int.parse(quantity) : 1,
         );
       },
+    ),
+    GoRoute(
+      name: 'revenue',
+      path: '/revenue',
+      builder: (context, state) => const RevenuePage(),
     ),
     GoRoute(
       name: 'product-detail',

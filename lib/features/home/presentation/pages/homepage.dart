@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:speech_to_text/speech_to_text.dart';
+import 'package:speech_to_text/speech_recognition_result.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../../../../core/widgets/app_header.dart';
 import '../../../../core/widgets/bottom_navbar.dart';
 import '../../domain/home_view_model.dart';
@@ -16,11 +19,24 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final HomeViewModel _viewModel = HomeViewModel();
+  final SpeechToText _speech = SpeechToText();
+  final TextEditingController _searchController = TextEditingController();
+  bool _speechAvailable = false;
+  bool _isListening = false;
+  String? _speechError;
 
   @override
   void initState() {
     super.initState();
     _viewModel.init();
+    _initSpeech();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _speech.stop();
+    super.dispose();
   }
 
   // Scroll handled by NotificationListener
@@ -28,6 +44,95 @@ class _HomePageState extends State<HomePage> {
   void _onNavTap(int index) {
     // TODO: Implement navigation logic
     // Currently home is index 2, so we don't navigate if already on home
+  }
+
+  Future<void> _initSpeech() async {
+    final available = await _speech.initialize(
+      onStatus: (status) {
+        if (status == 'notListening' && mounted) {
+          setState(() => _isListening = false);
+        }
+      },
+      onError: (error) {
+        if (!mounted) return;
+        setState(() {
+          _isListening = false;
+          _speechError = error.errorMsg;
+        });
+        _showSpeechError(error.errorMsg);
+      },
+    );
+
+    if (mounted) {
+      setState(() => _speechAvailable = available);
+    }
+  }
+
+  Future<void> _toggleListening() async {
+    final micOk = await _ensureMicPermission();
+    if (!micOk) {
+      _showSpeechError('Izin mikrofon ditolak. Izinkan di Settings.');
+      return;
+    }
+
+    if (!_speechAvailable) {
+      await _initSpeech();
+      if (!_speechAvailable) {
+        _showSpeechError('Microphone permission belum diberikan atau speech recognizer tidak tersedia.');
+        return;
+      }
+    }
+
+    if (_isListening) {
+      await _speech.stop();
+      if (mounted) setState(() => _isListening = false);
+    } else {
+      final started = await _speech.listen(
+        onResult: _onSpeechResult,
+        partialResults: true,
+        listenMode: ListenMode.dictation,
+        localeId: null,
+      );
+      if (mounted) setState(() => _isListening = started);
+      if (!started) {
+        _showSpeechError('Gagal memulai voice input.');
+      }
+    }
+  }
+
+  void _onSpeechResult(SpeechRecognitionResult result) {
+    if (!mounted) return;
+    final text = result.recognizedWords;
+    _searchController.text = text;
+    _searchController.selection = TextSelection.fromPosition(
+      TextPosition(offset: _searchController.text.length),
+    );
+
+    if (result.finalResult) {
+      _viewModel.searchProducts(text);
+      setState(() => _isListening = false);
+    }
+  }
+
+  void _showSpeechError(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  Future<bool> _ensureMicPermission() async {
+    final status = await Permission.microphone.status;
+    if (status.isGranted) return true;
+
+    final result = await Permission.microphone.request();
+    if (result.isGranted) return true;
+
+    if (result.isPermanentlyDenied) {
+      // Optionally guide user to settings
+      await openAppSettings();
+    }
+    return false;
   }
 
   @override
@@ -40,7 +145,15 @@ class _HomePageState extends State<HomePage> {
           body: SafeArea(
             child: Column(
               children: [
-                const AppHeader(title: 'PhotoKart', showSearch: true),
+                AppHeader(
+                  title: 'PhotoKart',
+                  showSearch: true,
+                  searchController: _searchController,
+                  isListening: _isListening,
+                  onSearchChanged: (value) => _viewModel.searchProducts(value, debounce: true),
+                  onSearchSubmitted: (value) => _viewModel.searchProducts(value),
+                  onMicTap: _toggleListening,
+                ),
                 Expanded(
                   child: NotificationListener<ScrollNotification>(
                     onNotification: (notification) {
@@ -54,27 +167,28 @@ class _HomePageState extends State<HomePage> {
                     },
                     child: CustomScrollView(
                       slivers: [
-                        SliverPadding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24),
-                          sliver: SliverList(
-                            delegate: SliverChildListDelegate([
-                              const SizedBox(height: 24),
-                              const Center(
-                                child: Text(
-                                  'Here are your Top Sales!',
-                                  style: TextStyle(
-                                    color: Color(0xFF304369),
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.w600,
+                        if (!state.isSearching)
+                          SliverPadding(
+                            padding: const EdgeInsets.symmetric(horizontal: 24),
+                            sliver: SliverList(
+                              delegate: SliverChildListDelegate([
+                                const SizedBox(height: 24),
+                                const Center(
+                                  child: Text(
+                                    'Here are your Top Sales!',
+                                    style: TextStyle(
+                                      color: Color(0xFF304369),
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              const SizedBox(height: 20),
-                              // Featured & Top Sales Section
-                              _buildTopSalesSection(state),
-                            ]),
+                                const SizedBox(height: 20),
+                                // Featured & Top Sales Section
+                                _buildTopSalesSection(state),
+                              ]),
+                            ),
                           ),
-                        ),
 
                         // If feed is empty show a retry CTA, otherwise show sliver grid
                         if (state.feedProducts.isEmpty && !state.loadingFeed)

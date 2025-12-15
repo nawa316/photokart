@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/widgets/bottom_navbar.dart';
-import '../widgets/chat_header.dart';
+import '../../../../core/widgets/app_header.dart';
 import 'chat_detail_page.dart';
 import '../../data/datasources/chat_remote_datasource.dart';
 import '../../data/repositories/chat_repository_impl.dart';
@@ -42,6 +42,8 @@ class _ChatOverviewPageState extends State<ChatOverviewPage> {
   String _filter = 'All'; 
   String _sort = 'Latest'; 
   String _readFilter = 'All'; 
+  String _searchQuery = '';
+  final TextEditingController _searchController = TextEditingController();
 
   late final ChatRepositoryImpl _chatRepository;
   List<Conversation> _conversations = [];
@@ -57,6 +59,12 @@ class _ChatOverviewPageState extends State<ChatOverviewPage> {
     );
     _chatRepository = ChatRepositoryImpl(remoteDataSource: dataSource);
     _loadConversations();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadConversations() async {
@@ -120,109 +128,47 @@ class _ChatOverviewPageState extends State<ChatOverviewPage> {
     setState(() { _readFilter = value ?? 'All'; });
   }
 
+  void _onSearchChanged(String value) {
+    setState(() {
+      _searchQuery = value.trim();
+    });
+  }
+
+  bool _matchesFilters(Conversation conversation) {
+    final platform = conversation.platform ?? 'Shopee';
+
+    if (_filter != 'All' && platform != _filter) {
+      return false;
+    }
+    if (_readFilter == 'Read' && conversation.unreadCount > 0) {
+      return false;
+    }
+    if (_readFilter == 'Unread' && conversation.unreadCount == 0) {
+      return false;
+    }
+
+    if (_searchQuery.isEmpty) return true;
+    final q = _searchQuery.toLowerCase();
+    final nameMatch = (conversation.otherUserName ?? '').toLowerCase().contains(q);
+    final msgMatch = (conversation.lastMessage ?? '').toLowerCase().contains(q);
+    final idMatch = conversation.id.toLowerCase().contains(q);
+    return nameMatch || msgMatch || idMatch;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-  
       body: Column(
         children: [
-          ChatHeader(
-          title: "", 
-          showSearch: true, // Enables the search bar field
-          backButtonOnPressed: () {
-            // Makes the back button functional, navigating to the previous screen
-            Navigator.of(context).pop(); 
-          },
-       
-  
-          searchHintText: "Search chat",
-        ),
-          // Header with filters
-          Container(
-            // padding: const EdgeInsets.all(16),
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 20), 
-
-            // color: Colors.white,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border(
-                bottom: BorderSide(
-                  color: Colors.grey.shade200, 
-                  width: 1.0, 
-                ),
-              ),
-            ),
-            
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Platform filter
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12,vertical: 0),
-                  decoration: BoxDecoration(
-                    color: Colors.pink[50],
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: DropdownButton<String>(
-                    value: _filter,
-                    isDense: true,
-                    underline: Container(),
-                    iconSize: 20,
-                    icon: const Icon(Icons.keyboard_arrow_down, color: Color(0xFF304369)),
-
-                    items: const [
-                      DropdownMenuItem(value: 'All', child: Text('All', style: TextStyle(color: Colors.blueGrey))),
-                      DropdownMenuItem(value: 'Shopee', child: Text('Shopee', style: TextStyle(color: Colors.blueGrey))),
-                      DropdownMenuItem(value: 'Tokopedia', child: Text('Tokopedia', style: TextStyle(color: Colors.blueGrey))),
-                      DropdownMenuItem(value: 'Twitter', child: Text('Twitter', style: TextStyle(color: Colors.blueGrey))),
-                    ],
-                    onChanged: _onFilterChanged,
-                  ),
-                ),
-                const SizedBox(width: 8),
-
-                // Sort filter
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-                  decoration: BoxDecoration(color: Colors.pink[50], borderRadius: BorderRadius.circular(8)),
-                  child: DropdownButton<String>(
-                    value: _sort,
-                    isDense: true,
-                    underline: Container(),
-                    iconSize: 20,
-                    icon: const Icon(Icons.keyboard_arrow_down, color: Color(0xFF304369)),
-                    items: const [
-                      DropdownMenuItem(value: 'Latest', child: Text('Latest', style: TextStyle(color: Colors.blueGrey))),
-                      DropdownMenuItem(value: 'Oldest', child: Text('Oldest')),
-                    ],
-                    onChanged: _onSortChanged,
-                  ),
-                ),
-                const SizedBox(width: 8),
-
-
-                // Read filter
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-                  decoration: BoxDecoration(color: Colors.pink[50], borderRadius: BorderRadius.circular(8)),
-                  child: DropdownButton<String>(
-                    value: _readFilter,
-                    isDense: true,
-                    underline: Container(),
-                    iconSize: 20, 
-                    icon: const Icon(Icons.keyboard_arrow_down, color: Color(0xFF304369)),
-
-                    items: const [
-                      DropdownMenuItem(value: 'All', child: Text('All', style: TextStyle(color: Colors.blueGrey))),
-                      DropdownMenuItem(value: 'Unread', child: Text('Unread', style: TextStyle(color: Colors.blueGrey))),
-                      DropdownMenuItem(value: 'Read', child: Text('Read', style: TextStyle(color: Colors.blueGrey))),
-                    ],
-                    onChanged: _onReadFilterChanged,
-                  ),
-                ),
-              ],
-            ),
+          AppHeader(
+            title: 'PhotoKart',
+            showSearch: true,
+            searchController: _searchController,
+            searchHint: 'Search chat',
+            onSearchChanged: _onSearchChanged,
+            onSearchSubmitted: _onSearchChanged,
           ),
+          const SizedBox(height: 12),
 
           // Chat list
           Expanded(
@@ -261,14 +207,7 @@ class _ChatOverviewPageState extends State<ChatOverviewPage> {
                                 final conversation = _conversations[index];
                                 final platform = conversation.platform ?? 'Shopee';
 
-                                // Apply filters
-                                if (_filter != 'All' && platform != _filter) {
-                                  return const SizedBox.shrink();
-                                }
-                                if (_readFilter == 'Read' && conversation.unreadCount > 0) {
-                                  return const SizedBox.shrink();
-                                }
-                                if (_readFilter == 'Unread' && conversation.unreadCount == 0) {
+                                if (!_matchesFilters(conversation)) {
                                   return const SizedBox.shrink();
                                 }
 

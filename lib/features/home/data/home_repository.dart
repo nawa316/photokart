@@ -54,4 +54,30 @@ class HomeRepository {
       return [];
     }
   }
+
+  Future<List<ProductModel>> searchProducts({
+    required String query,
+    int limit = 20,
+  }) async {
+    if (query.trim().isEmpty) return [];
+
+    try {
+      final keyword = '%${query.trim()}%';
+      final response = await _supabase
+          .from('product')
+          .select()
+          .or('name.ilike.$keyword,description.ilike.$keyword')
+          .order('createdAt', ascending: false)
+          .limit(limit);
+
+      final data = response as List<dynamic>? ?? [];
+      return data
+          .map((e) => ProductModel.fromMap(Map<String, dynamic>.from(e as Map)))
+          .toList();
+    } catch (e) {
+      // TODO: Handle error properly
+      print('Error searching products: $e');
+      return [];
+    }
+  }
 }
