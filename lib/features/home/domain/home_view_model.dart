@@ -11,6 +11,7 @@ class HomeViewState {
   final bool loadingFeed;
   final bool hasMore;
   final bool error;
+  final bool isSearching;
 
   HomeViewState({
     this.featuredProduct,
@@ -20,6 +21,7 @@ class HomeViewState {
     this.loadingFeed = false,
     this.hasMore = true,
     this.error = false,
+    this.isSearching = false,
   });
 
   HomeViewState copyWith({
@@ -30,6 +32,7 @@ class HomeViewState {
     bool? loadingFeed,
     bool? hasMore,
     bool? error,
+    bool? isSearching,
   }) {
     return HomeViewState(
       featuredProduct: featuredProduct ?? this.featuredProduct,
@@ -39,6 +42,7 @@ class HomeViewState {
       loadingFeed: loadingFeed ?? this.loadingFeed,
       hasMore: hasMore ?? this.hasMore,
       error: error ?? this.error,
+      isSearching: isSearching ?? this.isSearching,
     );
   }
 }
@@ -50,14 +54,61 @@ class HomeViewModel {
   
   int _page = 0;
   final int _limit = 10;
+  Timer? _searchDebounce;
 
   ValueListenable<HomeViewState> get state => _state;
   bool get loadingFeed => _state.value.loadingFeed;
   bool get hasMore => _state.value.hasMore;
 
   Future<void> init() async {
+    _state.value = _state.value.copyWith(isSearching: false);
     await _loadTopProducts();
     await _loadInitialFeed();
+  }
+
+  Future<void> searchProducts(String query, {bool debounce = false}) async {
+    if (debounce) {
+      _searchDebounce?.cancel();
+      _searchDebounce = Timer(const Duration(milliseconds: 350), () {
+        _executeSearch(query);
+      });
+      return;
+    }
+
+    _searchDebounce?.cancel();
+    await _executeSearch(query);
+  }
+
+  Future<void> _executeSearch(String query) async {
+    final keyword = query.trim();
+
+    if (keyword.isEmpty) {
+      _page = 0;
+      _state.value = _state.value.copyWith(isSearching: false);
+      await _loadFeedProducts(reset: true);
+      return;
+    }
+
+    _state.value = _state.value.copyWith(
+      loadingFeed: true,
+      error: false,
+      hasMore: false,
+      isSearching: true,
+    );
+
+    try {
+      final results = await _repository.searchProducts(query: keyword);
+      _state.value = _state.value.copyWith(
+        feedProducts: results,
+        loadingFeed: false,
+        hasMore: false,
+      );
+    } catch (e) {
+      _state.value = _state.value.copyWith(
+        loadingFeed: false,
+        error: true,
+      );
+    }
   }
 
   Future<void> _loadTopProducts() async {

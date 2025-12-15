@@ -4,11 +4,23 @@ import 'search_bar_widget.dart';
 class AppHeader extends StatelessWidget {
   final String title;
   final bool showSearch;
+  final ValueChanged<String>? onSearchChanged;
+  final ValueChanged<String>? onSearchSubmitted;
+  final VoidCallback? onMicTap;
+  final TextEditingController? searchController;
+  final bool isListening;
+  final String? searchHint;
 
   const AppHeader({
     super.key,
     required this.title,
     this.showSearch = false,
+    this.onSearchChanged,
+    this.onSearchSubmitted,
+    this.onMicTap,
+    this.searchController,
+    this.isListening = false,
+    this.searchHint,
   });
 
   @override
@@ -43,7 +55,14 @@ class AppHeader extends StatelessWidget {
           ),
           if (showSearch) ...[
             const SizedBox(height: 16),
-            const SearchBarWidget(),
+            SearchBarWidget(
+              onChanged: onSearchChanged,
+              onSubmitted: onSearchSubmitted,
+              onMicTap: onMicTap,
+              controller: searchController,
+              isListening: isListening,
+              hintText: searchHint ?? 'Search photocards',
+            ),
           ],
         ],
       ),

@@ -19,6 +19,7 @@ class OrderListPage extends StatefulWidget {
 class _OrderListPageState extends State<OrderListPage> {
   int _currentNavIndex = 1; // Default to Cart index
   late OrderListProvider _orderProvider;
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -38,6 +39,12 @@ class _OrderListPageState extends State<OrderListPage> {
   }
 
   @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
       value: _orderProvider,
@@ -45,7 +52,14 @@ class _OrderListPageState extends State<OrderListPage> {
         backgroundColor: const Color(0xFFF7FAFE),
         body: Column(
           children: [
-            const AppHeader(title: 'PhotoKart', showSearch: true),
+            AppHeader(
+              title: 'PhotoKart',
+              showSearch: true,
+              searchController: _searchController,
+              searchHint: 'Search orders',
+              onSearchChanged: (q) => _orderProvider.setSearchQuery(q),
+              onSearchSubmitted: (q) => _orderProvider.setSearchQuery(q),
+            ),
             Expanded(
               child: Consumer<OrderListProvider>(
                 builder: (context, provider, child) {

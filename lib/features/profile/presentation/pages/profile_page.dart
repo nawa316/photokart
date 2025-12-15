@@ -401,7 +401,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               _MenuItemCard(
                                 icon: Icons.attach_money,
                                 title: 'Revenue',
-                                onTap: () {},
+                                onTap: () => context.go('/revenue'),
                               ),
                               const SizedBox(height: 12),
                               _MenuItemCard(
