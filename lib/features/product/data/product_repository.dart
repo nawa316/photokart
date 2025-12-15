@@ -42,4 +42,29 @@ class ProductRepository {
 
     await api.insertProduct(product);
   }
+
+  /// Get products by userId
+  Future<List<ProductModel>> getProductsByUserId(String userId) async {
+    return await api.getProductsByUserId(userId);
+  }
+
+  /// Get all products
+  Future<List<ProductModel>> getAllProducts() async {
+    return await api.getAllProducts();
+  }
+
+  /// Get single product by ID
+  Future<ProductModel?> getProductById(String productId) async {
+    return await api.getProductById(productId);
+  }
+
+  /// Update product
+  Future<void> updateProduct(ProductModel product) async {
+    return await api.updateProduct(product);
+  }
+
+  /// Delete product
+  Future<void> deleteProduct(String productId) async {
+    return await api.deleteProduct(productId);
+  }
 }

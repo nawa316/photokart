@@ -55,19 +55,21 @@ class ProductModel {
   factory ProductModel.fromMap(Map<String, dynamic> map) {
     return ProductModel(
       id: map["id"]?.toString(), // Convert to string
-      name: map["name"],
-      description: map["description"],
-      price: (map["price"] as num).toDouble(),
-      stock: map["stock"],
-      userId: map["user_id"] ?? map["userId"],
-      imageUrl: map["image_url"] ?? map["imageUrl"],
+      name: map["name"] ?? '',
+      description: map["description"] ?? '',
+      price: (map["price"] as num?)?.toDouble() ?? 0.0,
+      stock: (map["stock"] as int?) ?? 0,
+      userId: map["userId"] ?? '',
+      imageUrl: map["imageUrl"] ?? '',
       rarity: map["rarity"] ?? 'common',
-      createdAt: DateTime.parse(map["created_at"] ?? map["createdAt"]),
+      createdAt: map["createdAt"] != null 
+          ? DateTime.parse(map["createdAt"]) 
+          : DateTime.now(),
       sales: (map["sales"] is int) ? map["sales"] as int : (map["sales"] is num ? (map["sales"] as num).toInt() : 0),
       rating: (map["rating"] is num) ? (map["rating"] as num).toDouble() : 0.0,
-      reviewCount: (map["review_count"] is int)
-          ? map["review_count"] as int
-          : (map["reviewCount"] is int ? map["reviewCount"] as int : 0),
+      reviewCount: (map["reviewCount"] is int)
+          ? map["reviewCount"] as int
+          : 0,
     );
   }
 }

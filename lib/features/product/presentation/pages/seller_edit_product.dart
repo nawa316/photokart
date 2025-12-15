@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../../../models/products.dart';
-
+import 'package:go_router/go_router.dart';
+import '../../domain/product_model.dart';
+import '../../data/product_repository.dart';
 
 class EditProductPage extends StatefulWidget {
-  final Product product;
+  final ProductModel product;
   const EditProductPage({super.key, required this.product});
 
   @override
@@ -22,12 +23,7 @@ class _EditProductPageState extends State<EditProductPage> {
     nameCtrl = TextEditingController(text: widget.product.name);
     descCtrl = TextEditingController(text: widget.product.description);
     stockCtrl = TextEditingController(text: widget.product.stock.toString());
-    // Extract numeric price from priceLabel (e.g., "RP. 120.000,00" -> "120000")
-    final priceString = widget.product.priceLabel
-        .replaceAll('RP. ', '')
-        .replaceAll('.', '')
-        .replaceAll(',00', '');
-    priceCtrl = TextEditingController(text: priceString);
+    priceCtrl = TextEditingController(text: widget.product.price.toStringAsFixed(0));
   }
 
   @override
@@ -61,11 +57,19 @@ class _EditProductPageState extends State<EditProductPage> {
             Center(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(20),
-                child: Image.asset(
-                  widget.product.image,
+                child: Image.network(
+                  widget.product.imageUrl,
                   width: 180,
                   height: 250,
                   fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      width: 180,
+                      height: 250,
+                      color: Colors.grey[300],
+                      child: const Icon(Icons.image_not_supported, size: 64),
+                    );
+                  },
                 ),
               ),
             ),
@@ -76,7 +80,7 @@ class _EditProductPageState extends State<EditProductPage> {
 
             const SizedBox(height: 20),
             _label("Description"),
-            _field(descCtrl),
+            _field(descCtrl, maxLines: 5, minLines: 3),
 
             const SizedBox(height: 20),
             _label("Stock"),
@@ -123,33 +127,49 @@ class _EditProductPageState extends State<EditProductPage> {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(18)),
                 ),
-                onPressed: () {
-                  // Format price to Indonesian Rupiah format
-                  final price = double.parse(priceCtrl.text);
-                  final formattedPrice = 'RP. ${price.toStringAsFixed(0).replaceAllMapped(
-                    RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-                    (Match m) => '${m[1]}.',
-                  )},00';
-                  
-                  Navigator.pop(
-                    context,
-                    Product(
+                onPressed: () async {
+                  try {
+                    final updatedProduct = ProductModel(
                       id: widget.product.id,
                       name: nameCtrl.text,
                       description: descCtrl.text,
-                      priceLabel: formattedPrice,
+                      price: double.parse(priceCtrl.text),
                       stock: int.parse(stockCtrl.text),
+                      userId: widget.product.userId,
+                      imageUrl: widget.product.imageUrl,
+                      rarity: widget.product.rarity,
+                      createdAt: widget.product.createdAt,
                       sales: widget.product.sales,
                       rating: widget.product.rating,
                       reviewCount: widget.product.reviewCount,
-                      image: widget.product.image,
-                      gradientColors: widget.product.gradientColors,
-                    ),
-                  );
+                    );
+
+                    await ProductRepository().updateProduct(updatedProduct);
+                    
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Product updated successfully'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                      context.pop(true);
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Error: $e'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  }
                 },
                 child: const Text("Save"),
               ),
             ),
+            const SizedBox(height: 40),
           ],
         ),
       ),
@@ -168,10 +188,12 @@ class _EditProductPageState extends State<EditProductPage> {
   }
 
   Widget _field(TextEditingController c,
-      {keyboard = TextInputType.text}) {
+      {keyboard = TextInputType.text, int? maxLines, int? minLines}) {
     return TextField(
       controller: c,
       keyboardType: keyboard,
+      maxLines: maxLines,
+      minLines: minLines,
       decoration: InputDecoration(
         filled: true,
         fillColor: Colors.white,

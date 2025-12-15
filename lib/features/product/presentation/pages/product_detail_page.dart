@@ -1,13 +1,31 @@
 import 'package:flutter/material.dart';
-import '../../../../models/products.dart';
-import 'seller_edit_product.dart';
+import 'package:go_router/go_router.dart';
+import '../../domain/product_model.dart';
+import '../../data/product_repository.dart';
 import '../../presentation/widgets/custom_popup.dart';
 
 
 class ProductDetailPage extends StatelessWidget {
-  final Product product;
+  final ProductModel product;
   const ProductDetailPage({super.key, required this.product});
-
+  String _formatPrice(double price) {
+    final priceStr = price.toStringAsFixed(2);
+    final parts = priceStr.split('.');
+    final intPart = parts[0];
+    final decPart = parts[1];
+    
+    String formatted = '';
+    int count = 0;
+    for (int i = intPart.length - 1; i >= 0; i--) {
+      if (count > 0 && count % 3 == 0) {
+        formatted = '.$formatted';
+      }
+      formatted = intPart[i] + formatted;
+      count++;
+    }
+    
+    return 'RP. $formatted,$decPart';
+  }
   @override
   Widget build(BuildContext context) {
     double w = MediaQuery.of(context).size.width;
@@ -53,11 +71,19 @@ class ProductDetailPage extends StatelessWidget {
               const SizedBox(height: 18),
               ClipRRect(
                 borderRadius: BorderRadius.circular(20),
-                child: Image.asset(
-                  product.image,
+                child: Image.network(
+                  product.imageUrl,
                   height: w * 1.1,
                   width: double.infinity,
                   fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      height: w * 1.1,
+                      width: double.infinity,
+                      color: Colors.grey[300],
+                      child: const Icon(Icons.image_not_supported, size: 64),
+                    );
+                  },
                 ),
               ),
 
@@ -66,7 +92,7 @@ class ProductDetailPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    product.formattedPrice,
+                    _formatPrice(product.price),
                     style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
@@ -123,13 +149,7 @@ class ProductDetailPage extends StatelessWidget {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>
-                              EditProductPage(product: product),
-                          ),
-                        );
+                        context.push('/editproduct/${product.id}');
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF7B95CF),
@@ -148,9 +168,26 @@ class ProductDetailPage extends StatelessWidget {
                           final isConfirm = await AppPopup.showDeleteConfirm(context);
 
                           if (isConfirm == true) {
-                            Navigator.pop(context);
-                            await Future.delayed(Duration(milliseconds: 200));
-                            AppPopup.showDeleteSuccess(context);
+                            try {
+                              await ProductRepository().deleteProduct(product.id!);
+                              if (context.mounted) {
+                                // Show success popup first
+                                await AppPopup.showDeleteSuccess(context);
+                                // Then navigate back
+                                if (context.mounted) {
+                                  context.pop(true); // Return true to indicate product was deleted
+                                }
+                              }
+                            } catch (e) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Error deleting product: $e'),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              }
+                            }
                           }
                         },
                       style: ElevatedButton.styleFrom(

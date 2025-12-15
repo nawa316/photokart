@@ -12,8 +12,8 @@ import '../features/chat/presentation/pages/chat_overview.dart';
 import '../features/profile/presentation/pages/profile_page.dart';
 import '../features/product/presentation/pages/seller_addproduct.dart';
 import '../features/product/presentation/pages/productpage.dart';
-import '../features/product/presentation/pages/seller_edit_product.dart';
-import '../features/product/presentation/pages/product_detail_page.dart';
+import '../features/product/presentation/pages/edit_product_wrapper.dart';
+import '../features/product/presentation/pages/product_detail_wrapper.dart';
 import '../features/order/presentation/pages/order_list_page.dart';
 
 final GoRouter appRouter = GoRouter(
@@ -81,11 +81,7 @@ final GoRouter appRouter = GoRouter(
       path: '/editproduct/:id',
       builder: (context, state) {
         final id = state.pathParameters['id'] ?? '';
-        final product = products.firstWhere(
-          (p) => p.id == id,
-          orElse: () => products.first,
-        );
-        return EditProductPage(product: product);
+        return EditProductWrapper(productId: id);
       },
     ),
     GoRoute(
@@ -103,11 +99,7 @@ final GoRouter appRouter = GoRouter(
       path: '/product/:id',
       builder: (context, state) {
         final id = state.pathParameters['id'] ?? '';
-        final product = products.firstWhere(
-          (p) => p.id == id,
-          orElse: () => products.first,
-        );
-        return ProductDetailPage(product: product);
+        return ProductDetailWrapper(productId: id);
       },
     ),
   ],
