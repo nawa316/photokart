@@ -10,7 +10,6 @@ import '../../../../core/widgets/bottom_navbar.dart';
 
 import 'user_profile.dart';
 import 'edit_profile_page.dart';
-import 'role_selection_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -46,10 +45,10 @@ class _ProfilePageState extends State<ProfilePage> {
 
     try {
       final data = await supabase
-          .from('users') 
-          .select()      
+          .from('users')
+          .select()
           .eq('id', user.id)
-          .maybeSingle(); 
+          .maybeSingle();
 
       if (data != null) {
         _profile = UserProfile.fromMap(data);
@@ -57,9 +56,7 @@ class _ProfilePageState extends State<ProfilePage> {
       } else {
         // kalau row belum ada, pakai data dari auth dan nanti bisa di-save
         _profile = UserProfile(
-          name: user.userMetadata?['username']?.toString() ??
-              user.email ??
-              '',
+          name: user.userMetadata?['username']?.toString() ?? user.email ?? '',
           email: user.email ?? '',
           phone: '',
           password: '**************************',
@@ -94,9 +91,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
     final updated = await Navigator.push<UserProfile>(
       context,
-      MaterialPageRoute(
-        builder: (_) => EditProfilePage(profile: _profile!),
-      ),
+      MaterialPageRoute(builder: (_) => EditProfilePage(profile: _profile!)),
     );
 
     if (updated != null) {
@@ -324,40 +319,16 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Future<void> _openSwitchRolePage() async {
-    final selectedRole = await Navigator.push<String>(
-      context,
-      MaterialPageRoute(
-        builder: (_) => RoleSelectionPage(initialRole: _currentRole),
-      ),
-    );
-
-    if (selectedRole != null && selectedRole != _currentRole) {
-      setState(() {
-        _currentRole = selectedRole;
-      });
-
-      // Simpan role ke tabel users
-      final supabase = Supabase.instance.client;
-      final user = supabase.auth.currentUser;
-      if (user != null) {
-        try {
-          await supabase
-              .from('users')
-              .update({'role': selectedRole})
-              .eq('id', user.id);
-        } catch (e) {
-          debugPrint('Error update role: $e');
-        }
-      }
-    }
-  }
-
   ImageProvider _buildAvatarImage(String path) {
     final effectivePath = (path.isEmpty) ? kDefaultAvatarPath : path;
 
     if (effectivePath.startsWith('assets/')) {
       return AssetImage(effectivePath);
+    }
+    // Check if it's a URL (from Supabase Storage)
+    if (effectivePath.startsWith('http://') ||
+        effectivePath.startsWith('https://')) {
+      return NetworkImage(effectivePath);
     }
     if (kIsWeb) {
       return NetworkImage(effectivePath);
@@ -372,66 +343,54 @@ class _ProfilePageState extends State<ProfilePage> {
       body: SafeArea(
         child: Column(
           children: [
-            const AppHeader(
-              title: 'PhotoKart',
-              showSearch: false,
-            ),
+            const AppHeader(title: 'PhotoKart', showSearch: false),
             Expanded(
               child: _loading
                   ? const Center(child: CircularProgressIndicator())
                   : (_profile == null)
-                      ? const Center(child: Text('No profile data'))
-                      : SingleChildScrollView(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 24, vertical: 20),
-                          child: Column(
-                            children: [
-                              _ProfileHeaderCard(
-                                profile: _profile!,
-                                imageProvider:
-                                    _buildAvatarImage(_profile!.avatarPath),
-                              ),
-                              const SizedBox(height: 20),
-                              _MenuItemCard(
-                                icon: Icons.person_outline,
-                                title: 'Account',
-                                onTap: _openEditProfile,
-                              ),
-                              const SizedBox(height: 12),
-                              _MenuItemCard(
-                                icon: Icons.attach_money,
-                                title: 'Statistics',
-                                onTap: () => context.go('/revenue'),
-                              ),
-                              const SizedBox(height: 12),
-                              _MenuItemCard(
-                                icon: Icons.delete_outline,
-                                title: 'Delete Account',
-                                showBadge: false,
-                                onTap: _showDeleteAccountDialog,
-                              ),
-                              const SizedBox(height: 12),
-                              _MenuItemCard(
-                                icon: Icons.exit_to_app,
-                                title: 'Exit Account',
-                                onTap: _showExitAccountDialog,
-                              ),
-                              const SizedBox(height: 12),
-                              _MenuItemCard(
-                                icon: Icons.account_balance_outlined,
-                                title: 'Bank Account',
-                                onTap: () {},
-                              ),
-                              const SizedBox(height: 12),
-                              _MenuItemCard(
-                                icon: Icons.swap_horiz,
-                                title: 'Switch Role',
-                                onTap: _openSwitchRolePage,
-                              ),
-                              const SizedBox(height: 32),
-                            ],
+                  ? const Center(child: Text('No profile data'))
+                  : SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 20,
+                      ),
+                      child: Column(
+                        children: [
+                          _ProfileHeaderCard(
+                            profile: _profile!,
+                            imageProvider: _buildAvatarImage(
+                              _profile!.avatarPath,
+                            ),
                           ),
-                        ),
+                          const SizedBox(height: 20),
+                          _MenuItemCard(
+                            icon: Icons.person_outline,
+                            title: 'Account',
+                            onTap: _openEditProfile,
+                          ),
+                          const SizedBox(height: 12),
+                          _MenuItemCard(
+                            icon: Icons.attach_money,
+                            title: 'Revenue',
+                            onTap: () {},
+                          ),
+                          const SizedBox(height: 12),
+                          _MenuItemCard(
+                            icon: Icons.delete_outline,
+                            title: 'Delete Account',
+                            showBadge: false,
+                            onTap: _showDeleteAccountDialog,
+                          ),
+                          const SizedBox(height: 12),
+                          _MenuItemCard(
+                            icon: Icons.exit_to_app,
+                            title: 'Exit Account',
+                            onTap: _showExitAccountDialog,
+                          ),
+                          const SizedBox(height: 32),
+                        ],
+                      ),
+                    ),
             ),
           ],
         ),
@@ -467,13 +426,14 @@ class _ProfileHeaderCard extends StatelessWidget {
           Container(
             width: 56,
             height: 56,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-            ),
+            decoration: const BoxDecoration(shape: BoxShape.circle),
             child: ClipOval(
               child: Image(
                 image: imageProvider,
                 fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset(kDefaultAvatarPath, fit: BoxFit.cover);
+                },
               ),
             ),
           ),
@@ -532,11 +492,7 @@ class _MenuItemCard extends StatelessWidget {
                   color: const Color(0xFF304369).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(
-                  icon,
-                  size: 22,
-                  color: const Color(0xFF304369),
-                ),
+                child: Icon(icon, size: 22, color: const Color(0xFF304369)),
               ),
               const SizedBox(width: 16),
               Expanded(

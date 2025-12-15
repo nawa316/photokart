@@ -29,6 +29,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   late String _avatarPath;
 
   final ImagePicker _picker = ImagePicker();
+  bool _isUploading = false;
 
   @override
   void initState() {
@@ -57,11 +58,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   ImageProvider _buildAvatarImageProvider() {
-    final effectivePath =
-        _avatarPath.isEmpty ? kDefaultAvatarPath : _avatarPath;
+    final effectivePath = _avatarPath.isEmpty
+        ? kDefaultAvatarPath
+        : _avatarPath;
 
     if (effectivePath.startsWith('assets/')) {
       return AssetImage(effectivePath);
+    }
+    // Check if it's a URL (from Supabase Storage)
+    if (effectivePath.startsWith('http://') ||
+        effectivePath.startsWith('https://')) {
+      return NetworkImage(effectivePath);
     }
     if (kIsWeb) {
       return NetworkImage(effectivePath);
@@ -70,11 +77,87 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Future<void> _pickFromGallery() async {
-    final picked = await _picker.pickImage(source: ImageSource.gallery);
+    final picked = await _picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 800,
+      maxHeight: 800,
+      imageQuality: 85,
+    );
+
     if (picked != null) {
       setState(() {
-        _avatarPath = picked.path;
+        _isUploading = true;
       });
+
+      try {
+        // Upload to Supabase Storage
+        final supabase = Supabase.instance.client;
+        final userId = supabase.auth.currentUser?.id;
+
+        if (userId == null) {
+          throw Exception('User not authenticated');
+        }
+
+        final bytes = await picked.readAsBytes();
+        final fileExt = picked.path.split('.').last.toLowerCase();
+        final fileName =
+            '${userId}_${DateTime.now().millisecondsSinceEpoch}.$fileExt';
+        final filePath = '$fileName';
+
+        // Determine content type based on file extension
+        String contentType;
+        switch (fileExt) {
+          case 'jpg':
+          case 'jpeg':
+            contentType = 'image/jpeg';
+            break;
+          case 'png':
+            contentType = 'image/png';
+            break;
+          case 'gif':
+            contentType = 'image/gif';
+            break;
+          case 'webp':
+            contentType = 'image/webp';
+            break;
+          default:
+            contentType = 'image/jpeg';
+        }
+
+        // Upload file to storage bucket 'avatars' with proper content-type
+        await supabase.storage
+            .from('avatars')
+            .uploadBinary(
+              filePath,
+              bytes,
+              fileOptions: FileOptions(contentType: contentType, upsert: true),
+            );
+
+        // Get public URL
+        final publicUrl = supabase.storage
+            .from('avatars')
+            .getPublicUrl(filePath);
+
+        if (mounted) {
+          setState(() {
+            _avatarPath = publicUrl;
+            _isUploading = false;
+          });
+        }
+      } catch (e) {
+        debugPrint('Error uploading avatar: $e');
+        if (mounted) {
+          setState(() {
+            _isUploading = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to upload image: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
     }
   }
 
@@ -154,6 +237,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Future<void> _saveProfile() async {
+    if (_isUploading) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please wait for image upload to complete'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _isUploading = true;
+    });
+
     final updated = widget.profile.copyWith(
       name: _usernameController.text,
       email: _emailController.text,
@@ -168,15 +265,35 @@ class _EditProfilePageState extends State<EditProfilePage> {
     if (user != null) {
       try {
         await supabase
-            .from('users') // ⬅️ tabel users
+            .from('users')
             .update(updated.toUpdateMap())
             .eq('id', user.id);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Profile updated successfully'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
       } catch (e) {
         debugPrint('Failed to update profile: $e');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to update profile: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
     }
 
     if (mounted) {
+      setState(() {
+        _isUploading = false;
+      });
       Navigator.pop(context, updated);
     }
   }
@@ -188,14 +305,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
       body: SafeArea(
         child: Column(
           children: [
-            const AppHeader(
-              title: 'PhotoKart',
-              showSearch: false,
-            ),
+            const AppHeader(title: 'PhotoKart', showSearch: false),
             Expanded(
               child: SingleChildScrollView(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 16,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -225,9 +341,27 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     const SizedBox(height: 24),
 
                     Center(
-                      child: _AvatarCard(
-                        imageProvider: _buildAvatarImageProvider(),
-                        onTapPlus: _showPhotoOptions,
+                      child: Stack(
+                        children: [
+                          _AvatarCard(
+                            imageProvider: _buildAvatarImageProvider(),
+                            onTapPlus: _showPhotoOptions,
+                          ),
+                          if (_isUploading)
+                            Positioned.fill(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.5),
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                child: const Center(
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 32),
@@ -265,7 +399,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       width: double.infinity,
                       height: 64,
                       child: ElevatedButton(
-                        onPressed: _saveProfile,
+                        onPressed: _isUploading ? null : _saveProfile,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF7B95CF),
                           shape: RoundedRectangleBorder(
@@ -273,15 +407,24 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           ),
                           elevation: 4,
                         ),
-                        child: const Text(
-                          'Save',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontFamily: 'Poppins',
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                          ),
-                        ),
+                        child: _isUploading
+                            ? const SizedBox(
+                                height: 24,
+                                width: 24,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Text(
+                                'Save',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontFamily: 'Poppins',
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
                       ),
                     ),
                     const SizedBox(height: 40),
@@ -304,10 +447,7 @@ class _AvatarCard extends StatelessWidget {
   final ImageProvider imageProvider;
   final VoidCallback onTapPlus;
 
-  const _AvatarCard({
-    required this.imageProvider,
-    required this.onTapPlus,
-  });
+  const _AvatarCard({required this.imageProvider, required this.onTapPlus});
 
   @override
   Widget build(BuildContext context) {
@@ -320,10 +460,7 @@ class _AvatarCard extends StatelessWidget {
           Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(5),
-              border: Border.all(
-                color: const Color(0x7F7B95CF),
-                width: 1,
-              ),
+              border: Border.all(color: const Color(0x7F7B95CF), width: 1),
               boxShadow: const [
                 BoxShadow(
                   color: Color(0x337B95CF),
@@ -339,6 +476,14 @@ class _AvatarCard extends StatelessWidget {
                 width: 140,
                 height: 140,
                 fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset(
+                    kDefaultAvatarPath,
+                    width: 140,
+                    height: 140,
+                    fit: BoxFit.cover,
+                  );
+                },
               ),
             ),
           ),
@@ -353,10 +498,7 @@ class _AvatarCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.circle,
-                  border: Border.all(
-                    color: const Color(0xFF304369),
-                    width: 1,
-                  ),
+                  border: Border.all(color: const Color(0xFF304369), width: 1),
                 ),
                 child: const Icon(
                   Icons.add,
@@ -414,23 +556,19 @@ class _OutlinedTextField extends StatelessWidget {
         fontWeight: FontWeight.w500,
       ),
       decoration: InputDecoration(
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 24,
+          vertical: 12,
+        ),
         filled: true,
         fillColor: const Color(0xFFF6F7F9),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(
-            color: Color(0xFF7B95CF),
-            width: 1,
-          ),
+          borderSide: const BorderSide(color: Color(0xFF7B95CF), width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(
-            color: Color(0xFF7B95CF),
-            width: 1.2,
-          ),
+          borderSide: const BorderSide(color: Color(0xFF7B95CF), width: 1.2),
         ),
       ),
     );
@@ -441,10 +579,7 @@ class _BottomSheetButton extends StatelessWidget {
   final String text;
   final VoidCallback onTap;
 
-  const _BottomSheetButton({
-    required this.text,
-    required this.onTap,
-  });
+  const _BottomSheetButton({required this.text, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
