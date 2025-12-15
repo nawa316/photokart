@@ -18,7 +18,7 @@ class PhotoKartBottomNavBar extends StatelessWidget {
 
     // skala dari desain 39x39 dan 58x58
     final smallIconSize = h * (39 / 932);
-    final bigIconSize   = h * (58 / 932);
+    final bigIconSize = h * (58 / 932);
 
     return ClipRRect(
       borderRadius: const BorderRadius.only(
@@ -56,6 +56,7 @@ class PhotoKartBottomNavBar extends StatelessWidget {
             showSelectedLabels: false,
             showUnselectedLabels: false,
             onTap: (index) {
+              // kasih tau parent dulu
               onTap(index);
                // Navigate based on the tapped index
               switch (index) {
@@ -77,57 +78,76 @@ class PhotoKartBottomNavBar extends StatelessWidget {
               }
             },
             items: [
+              // ========= SHOP =========
               BottomNavigationBarItem(
                 label: 'Shop',
                 icon: SizedBox(
                   width: smallIconSize,
                   height: smallIconSize,
                   child: Image.asset(
-                    'assets/images/bag.png',
+                    currentIndex == 0
+                        ? 'assets/images/bag_clicked.png'
+                        : 'assets/images/bag.png',
                     fit: BoxFit.contain,
                   ),
                 ),
               ),
+
+              // ========= CART =========
               BottomNavigationBarItem(
                 label: 'Cart',
                 icon: SizedBox(
                   width: smallIconSize,
                   height: smallIconSize,
                   child: Image.asset(
-                    'assets/images/cart.png',
+                    currentIndex == 1
+                        ? 'assets/images/cart_clicked.png'
+                        : 'assets/images/cart.png',
                     fit: BoxFit.contain,
                   ),
                 ),
               ),
+
+              // ========= CENTER / PHOTOKART =========
               BottomNavigationBarItem(
                 label: 'PhotoKart',
                 icon: SizedBox(
                   width: bigIconSize,
                   height: bigIconSize,
                   child: Image.asset(
-                    'assets/images/center_clicked.png',
+                    currentIndex == 2
+                        ? 'assets/images/center_clicked.png'
+                        : 'assets/images/center.png',
                     fit: BoxFit.contain,
                   ),
                 ),
               ),
+
+              // ========= CHAT =========
               BottomNavigationBarItem(
                 label: 'Chat',
                 icon: SizedBox(
                   width: smallIconSize,
                   height: smallIconSize,
                   child: Image.asset(
-                    'assets/images/chat.png',
+                    currentIndex == 3
+                        ? 'assets/images/chat_clicked.png'
+                        : 'assets/images/chat.png',
                     fit: BoxFit.contain,
                   ),
                 ),
               ),
+
+              // ========= PROFILE =========
               BottomNavigationBarItem(
                 label: 'Profile',
                 icon: SizedBox(
                   width: smallIconSize,
                   height: smallIconSize,
                   child: Image.asset(
-                    'assets/images/profile.png',
+                    currentIndex == 4
+                        ? 'assets/images/profile_clicked.png'
+                        : 'assets/images/profile.png',
                     fit: BoxFit.contain,
                   ),
                 ),
