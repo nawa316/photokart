@@ -647,7 +647,6 @@ Widget build(BuildContext context) {
                                     style: const TextStyle(
                                       fontWeight: FontWeight.w700,
                                       color: Color(0xFF304369),
-                                      decoration: TextDecoration.underline,
                                     ),
                                     recognizer: TapGestureRecognizer()
                                       ..onTap = () => context.go('/login'),

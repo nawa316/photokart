@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:photokart/models/products.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../features/auth/presentation/pages/onboarding_page.dart';
@@ -9,17 +10,27 @@ import '../features/home/presentation/pages/homepage.dart';
 import '../features/product/presentation/pages/top_rating.dart';
 import '../features/review/presentation/pages/reviewpage.dart';
 import '../features/chat/presentation/pages/chat_overview.dart';
+import '../features/profile/presentation/pages/profile_page.dart';
 import '../features/product/presentation/pages/addproduct.dart';
 import '../features/product/presentation/pages/productpage.dart';
+import '../features/product/presentation/pages/edit_product_page.dart';
+import '../features/product/presentation/pages/product_detail_page.dart';
+import '../features/order/presentation/pages/order_list_page.dart';
 
 final GoRouter appRouter = GoRouter(
   routes: [
-    GoRoute(path: '/', builder: (context, state) => const HomePage()),
+    GoRoute(
+      path: '/',
+      builder: (context, state) => const HomePage(),
+    ),
     GoRoute(
       path: '/onboarding',
       builder: (context, state) => const OnboardingPage(),
     ),
-    GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
+    GoRoute(
+      path: '/login',
+      builder: (context, state) => const LoginPage(),
+    ),
     GoRoute(
       path: '/register',
       builder: (context, state) => const RegisterPage(),
@@ -52,6 +63,11 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) => const ChatOverviewPage(),
     ),
     GoRoute(
+      name: 'profile',
+      path: '/profile',
+      builder: (context, state) => const ProfilePage(),
+    ),
+    GoRoute(
       name: 'addproduct',
       path: '/addproduct',
       builder: (context, state) => const AddProductPage(),
@@ -66,6 +82,23 @@ final GoRouter appRouter = GoRouter(
       path: '/product',
       builder: (context, state) => const ProductPage(),
     ),
+    GoRoute(
+      name: 'order',
+      path: '/order',
+      builder: (context, state) => const OrderListPage(),
+    ),
+    GoRoute(
+      name: 'product-detail',
+      path: '/product/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'] ?? '';
+        final product = products.firstWhere(
+          (p) => p.id == id,
+          orElse: () => products.first,
+        );
+        return ProductDetailPage(product: product);
+      },
+    ),
   ],
   redirect: (context, state) {
     final session = Supabase.instance.client.auth.currentSession;
@@ -74,8 +107,11 @@ final GoRouter appRouter = GoRouter(
       '/register',
       '/onboarding',
     ];
+
     // Allow email-verification page without session
-    final isEmailVerification = state.uri.path.startsWith('/email-verification');
+    final isEmailVerification =
+        state.uri.path.startsWith('/email-verification');
+
     if (session == null &&
         !allowedPaths.contains(state.uri.path) &&
         !isEmailVerification) {

@@ -58,23 +58,22 @@ class PhotoKartBottomNavBar extends StatelessWidget {
             onTap: (index) {
               // kasih tau parent dulu
               onTap(index);
-
-              // lalu navigasi
+               // Navigate based on the tapped index
               switch (index) {
-                case 0:
-                  context.go('/shop');     // ganti ke route shop-mu
+                case 0: // Shop
+                  context.go('/product'); // Replace with your shop route
                   break;
-                case 1:
-                  context.go('/cart');     // ganti ke route cart-mu
+                case 1: // Cart
+                  context.go('/order'); // Replace with your cart route
                   break;
-                case 2:
-                  context.go('/');         // halaman utama / photokart
+                case 2: // Home/PhotoKart
+                  context.go('/'); // Home route
                   break;
-                case 3:
+                case 3: // Chat
                   context.go('/chat');
                   break;
-                case 4:
-                  context.go('/profile');  // ganti ke route profile-mu
+                case 4: // Profile
+                  context.go('/profile'); // Replace with your profile route
                   break;
               }
             },
