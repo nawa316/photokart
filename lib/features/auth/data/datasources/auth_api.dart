@@ -16,7 +16,11 @@ class AuthApi {
     required String role,
   }) async {
     try {
-      // Sign up with Supabase Auth
+      // 1. CEK DUPLIKAT TERLEBIH DAHULU (PENTING)
+      // Ini memastikan kita mendapat pesan error yang custom sesuai request Anda
+      await _checkIsDuplicate(username, email);
+
+      // 2. Jika lolos cek, baru daftar ke Supabase Auth
       final response = await _supabaseService.client.auth.signUp(
         email: email,
         password: password,
@@ -31,7 +35,7 @@ class AuthApi {
         throw Exception('Registration failed: User is null');
       }
 
-      // Create user profile in database
+      // 3. Masukkan data ke tabel 'users'
       await _supabaseService.client.from('users').insert({
         'id': response.user!.id,
         'username': username,
@@ -41,7 +45,7 @@ class AuthApi {
         'created_at': DateTime.now().toIso8601String(),
       });
 
-      // Fetch the created user profile
+      // 4. Ambil data profil yang baru dibuat
       final userProfile = await _supabaseService.client
           .from('users')
           .select()
@@ -49,10 +53,40 @@ class AuthApi {
           .single();
 
       return UserModel.fromJson(userProfile);
+
     } on AuthException catch (e) {
-      throw Exception('Auth error: ${e.message}');
+      // Menangkap error bawaan Supabase
+      throw Exception(e.message);
     } catch (e) {
-      throw Exception('Registration failed: $e');
+      // Membersihkan tulisan "Exception: " agar pesan di UI bersih
+      throw Exception(e.toString().replaceAll('Exception: ', ''));
+    }
+  }
+
+  /// --- FUNGSI KHUSUS CEK DUPLIKAT ---
+  Future<void> _checkIsDuplicate(String username, String email) async {
+    // A. Cek Username
+    final usernameCheck = await _supabaseService.client
+        .from('users')
+        .select('username')
+        .eq('username', username)
+        .limit(1) // <--- TAMBAHKAN INI (Ambil 1 saja cukup)
+        .maybeSingle();
+
+    if (usernameCheck != null) {
+      throw Exception('Username already taken!');
+    }
+
+    // B. Cek Email
+    final emailCheck = await _supabaseService.client
+        .from('users')
+        .select('email')
+        .eq('email', email)
+        .limit(1) // <--- TAMBAHKAN INI JUGA
+        .maybeSingle();
+
+    if (emailCheck != null) {
+      throw Exception('Email already used! Use another email!');
     }
   }
 
@@ -66,17 +100,18 @@ class AuthApi {
 
       // Check if input is username instead of email
       if (!emailOrUsername.contains('@')) {
-        // Fetch email from username
         final result = await _supabaseService.client
             .from('users')
             .select('email')
             .eq('username', emailOrUsername)
-            .single();
+            .maybeSingle();
         
+        if (result == null) {
+           throw Exception('Username not found');
+        }
         email = result['email'] as String;
       }
 
-      // Sign in with email and password
       final response = await _supabaseService.client.auth.signInWithPassword(
         email: email,
         password: password,
@@ -86,7 +121,6 @@ class AuthApi {
         throw Exception('Login failed: User is null');
       }
 
-      // Fetch user profile
       final userProfile = await _supabaseService.client
           .from('users')
           .select()
@@ -95,13 +129,12 @@ class AuthApi {
 
       return UserModel.fromJson(userProfile);
     } on AuthException catch (e) {
-      throw Exception('Auth error: ${e.message}');
+      throw Exception(e.message);
     } catch (e) {
-      throw Exception('Login failed: $e');
+      throw Exception(e.toString().replaceAll('Exception: ', ''));
     }
   }
 
-  /// Sign out current user
   Future<void> logout() async {
     try {
       await _supabaseService.client.auth.signOut();
@@ -110,14 +143,10 @@ class AuthApi {
     }
   }
 
-  /// Get current user profile
   Future<UserModel?> getCurrentUser() async {
     try {
       final user = _supabaseService.currentUser;
-      
-      if (user == null) {
-        return null;
-      }
+      if (user == null) return null;
 
       final userProfile = await _supabaseService.client
           .from('users')
@@ -131,7 +160,6 @@ class AuthApi {
     }
   }
 
-  /// Check if user is authenticated
   bool isAuthenticated() {
     return _supabaseService.isAuthenticated;
   }
