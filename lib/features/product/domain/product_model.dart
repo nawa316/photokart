@@ -8,6 +8,9 @@ class ProductModel {
   final String imageUrl;
   final String rarity;
   final DateTime createdAt;
+  final int sales;
+  final double rating;
+  final int reviewCount;
 
   ProductModel({
     this.id, // Now accepts String
@@ -19,6 +22,9 @@ class ProductModel {
     required this.imageUrl,
     required this.rarity,
     DateTime? createdAt,
+    this.sales = 0,
+    this.rating = 0.0,
+    this.reviewCount = 0,
   }) : createdAt = createdAt ?? DateTime.now();
 
   /// Convert ProductModel to map for Supabase insert
@@ -32,6 +38,9 @@ class ProductModel {
       "imageUrl": imageUrl,
       "rarity": rarity,
       "createdAt": createdAt.toIso8601String(),
+      "sales": sales,
+      "rating": rating,
+      "reviewCount": reviewCount,
     };
     
     // Only include id if it exists (for updates)
@@ -50,10 +59,15 @@ class ProductModel {
       description: map["description"],
       price: (map["price"] as num).toDouble(),
       stock: map["stock"],
-      userId: map["user_id"],
-      imageUrl: map["image_url"],
+      userId: map["user_id"] ?? map["userId"],
+      imageUrl: map["image_url"] ?? map["imageUrl"],
       rarity: map["rarity"] ?? 'common',
-      createdAt: DateTime.parse(map["created_at"]),
+      createdAt: DateTime.parse(map["created_at"] ?? map["createdAt"]),
+      sales: (map["sales"] is int) ? map["sales"] as int : (map["sales"] is num ? (map["sales"] as num).toInt() : 0),
+      rating: (map["rating"] is num) ? (map["rating"] as num).toDouble() : 0.0,
+      reviewCount: (map["review_count"] is int)
+          ? map["review_count"] as int
+          : (map["reviewCount"] is int ? map["reviewCount"] as int : 0),
     );
   }
 }

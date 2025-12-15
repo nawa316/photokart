@@ -1,7 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:photokart/models/products.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
 import '../features/auth/presentation/pages/onboarding_page.dart';
 import '../features/auth/presentation/pages/login_page.dart';
 import '../features/auth/presentation/pages/register_page.dart';
@@ -11,9 +10,9 @@ import '../features/product/presentation/pages/top_rating.dart';
 import '../features/review/presentation/pages/reviewpage.dart';
 import '../features/chat/presentation/pages/chat_overview.dart';
 import '../features/profile/presentation/pages/profile_page.dart';
-import '../features/product/presentation/pages/addproduct.dart';
+import '../features/product/presentation/pages/seller_addproduct.dart';
 import '../features/product/presentation/pages/productpage.dart';
-import '../features/product/presentation/pages/edit_product_page.dart';
+import '../features/product/presentation/pages/seller_edit_product.dart';
 import '../features/product/presentation/pages/product_detail_page.dart';
 import '../features/order/presentation/pages/order_list_page.dart';
 
@@ -76,6 +75,18 @@ final GoRouter appRouter = GoRouter(
       name: 'toprating',
       path: '/toprating',
       builder: (context, state) => const TopRating(),
+    ),
+    GoRoute(
+      name: 'editproduct',
+      path: '/editproduct/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'] ?? '';
+        final product = products.firstWhere(
+          (p) => p.id == id,
+          orElse: () => products.first,
+        );
+        return EditProductPage(product: product);
+      },
     ),
     GoRoute(
       name: 'product',

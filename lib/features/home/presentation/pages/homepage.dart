@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../../../core/widgets/app_header.dart';
 import '../../../../core/widgets/bottom_navbar.dart';
+import '../../domain/home_view_model.dart';
+import '../widget/featured_card.dart';
+import '../widget/top_sales_header.dart';
+import '../widget/top_sales_list.dart';
+import '../widget/small_product_card.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -10,265 +15,153 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _currentIndex = 2;
+  final HomeViewModel _viewModel = HomeViewModel();
+
+  @override
+  void initState() {
+    super.initState();
+    _viewModel.init();
+  }
+
+  // Scroll handled by NotificationListener
 
   void _onNavTap(int index) {
-    if (index != 2) return;
+    // TODO: Implement navigation logic
+    // Currently home is index 2, so we don't navigate if already on home
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF7FAFE),
-      body: SafeArea(
-        child: Column(
-          children: [
-            const AppHeader(title: 'PhotoKart', showSearch: true),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    SizedBox(height: 24),
-                    Center(
-                      child: Text(
-                        'Here are your Top Sales!',
-                        style: TextStyle(
-                          color: Color(0xFF304369),
-                          fontSize: 24,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    FeaturedCard(),
-                    SizedBox(height: 32),
-                    TopSalesHeader(),
-                    SizedBox(height: 16),
-                    TopSalesList(),
-                    SizedBox(height: 40),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: PhotoKartBottomNavBar(
-        currentIndex: _currentIndex,
-        onTap: _onNavTap,
-      ),
-    );
-  }
-}
-
-class FeaturedCard extends StatelessWidget {
-  const FeaturedCard({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.center,
-      child: SizedBox(
-        width: 320,
-        child: Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFFFFFBFB),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: const Color(0x7F7B95CF)),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x337B95CF),
-                blurRadius: 30,
-                offset: Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Column(
-            children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(20),
-                ),
-                child: Image.asset(
-                  'assets/images/hanni.png',
-                  height: 236,
-                  width: 320,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                height: 45,
-                child: Row(
-                  children: [
-                    Container(
-                      height: 24,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF5A623),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      alignment: Alignment.center,
-                      child: const Text(
-                        '1',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    const Expanded(
-                      child: Text(
-                        'Hanni Bengong',
-                        style: TextStyle(
-                          color: Color(0xFF304369),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                    const Text(
-                      '4.9 | 120 Reviews',
-                      style: TextStyle(
-                        color: Color(0xFF304369),
-                        fontSize: 10,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class TopSalesHeader extends StatelessWidget {
-  const TopSalesHeader({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: const [
-        Text(
-          'Top Sales',
-          style: TextStyle(
-            color: Color(0xFF304369),
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        Spacer(),
-        Text(
-          'View All',
-          style: TextStyle(
-            color: Color(0xFF7B95CF),
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class TopSalesList extends StatelessWidget {
-  const TopSalesList({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final List<Map<String, dynamic>> items = [
-      {'rank': 2, 'name': 'Suzi', 'img': 'assets/images/suzi.png'},
-      {'rank': 3, 'name': 'Karina Dagu', 'img': 'assets/images/karina.png'},
-      {'rank': 4, 'name': 'Ahul Indokor', 'img': 'assets/images/ahul.png'},
-      {'rank': 5, 'name': 'Jungkook', 'img': 'assets/images/jk.png'},
-    ];
-
-    return SizedBox(
-      height: 180,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: items.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 14),
-        itemBuilder: (context, index) {
-          final item = items[index];
-          return SizedBox(
-            width: 92,
+    return ValueListenableBuilder<HomeViewState>(
+      valueListenable: _viewModel.state,
+      builder: (context, state, _) {
+        return Scaffold(
+          backgroundColor: const Color(0xFFF7FAFE),
+          body: SafeArea(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const AppHeader(title: 'PhotoKart', showSearch: true),
                 Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: const Color(0x7F7B95CF)),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Color(0x3F000000),
-                          blurRadius: 4,
-                          offset: Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Stack(
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(14),
-                          child: Image.asset(
-                            item['img'] as String,
-                            width: double.infinity,
-                            height: double.infinity,
-                            fit: BoxFit.cover,
+                  child: NotificationListener<ScrollNotification>(
+                    onNotification: (notification) {
+                      try {
+                        final metrics = notification.metrics;
+                        if (metrics.extentAfter < 300 && _viewModel.hasMore && !_viewModel.loadingFeed) {
+                          _viewModel.loadMoreProducts();
+                        }
+                      } catch (_) {}
+                      return false;
+                    },
+                    child: CustomScrollView(
+                      slivers: [
+                        SliverPadding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          sliver: SliverList(
+                            delegate: SliverChildListDelegate([
+                              const SizedBox(height: 24),
+                              const Center(
+                                child: Text(
+                                  'Here are your Top Sales!',
+                                  style: TextStyle(
+                                    color: Color(0xFF304369),
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              // Featured & Top Sales Section
+                              _buildTopSalesSection(state),
+                            ]),
                           ),
                         ),
-                        Positioned(
-                          left: 8,
-                          top: 8,
-                          child: Container(
-                            width: 22,
-                            height: 22,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF5A623),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            alignment: Alignment.center,
-                            child: Text(
-                              '${item['rank']}',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
+
+                        // If feed is empty show a retry CTA, otherwise show sliver grid
+                        if (state.feedProducts.isEmpty && !state.loadingFeed)
+                          SliverToBoxAdapter(
+                            child: Center(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 24),
+                                child: Column(
+                                  children: [
+                                    const Text('No products found'),
+                                    const SizedBox(height: 12),
+                                    ElevatedButton(
+                                      onPressed: () => _viewModel.init(),
+                                      child: const Text('Retry'),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
+                          )
+                        else
+                        // Random Feed Section as a sliver grid with matching horizontal padding
+                        SliverPadding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                          sliver: SliverGrid(
+                            delegate: SliverChildBuilderDelegate(
+                              (context, index) => SmallProductCard(product: state.feedProducts[index]),
+                              childCount: state.feedProducts.length,
+                            ),
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 12,
+                              mainAxisSpacing: 12,
+                              childAspectRatio: 0.72,
+                            ),
                           ),
                         ),
+
+                        if (state.loadingFeed)
+                          const SliverToBoxAdapter(
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 12),
+                              child: Center(child: CircularProgressIndicator()),
+                            ),
+                          ),
+
+                        const SliverToBoxAdapter(child: SizedBox(height: 40)),
                       ],
                     ),
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  item['name'] as String,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Color(0xFF304369),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
             ),
-          );
-        },
-      ),
+          ),
+          bottomNavigationBar: PhotoKartBottomNavBar(
+            currentIndex: 2, // Home is index 2
+            onTap: _onNavTap,
+          ),
+        );
+      },
     );
   }
+
+  Widget _buildTopSalesSection(HomeViewState state) {
+    if (state.loadingTop) {
+      return const SizedBox(
+        height: 236,
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (state.featuredProduct == null && state.topProducts.isEmpty) {
+      return const SizedBox();
+    }
+
+    return Column(
+      children: [
+        if (state.featuredProduct != null) ...[
+          FeaturedCard(product: state.featuredProduct!),
+          const SizedBox(height: 32),
+        ],
+        const TopSalesHeader(),
+        const SizedBox(height: 16),
+        TopSalesList(products: state.topProducts),
+        const SizedBox(height: 24),
+      ],
+    );
+  }
+  
 }

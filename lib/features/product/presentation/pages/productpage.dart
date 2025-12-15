@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../../core/widgets/app_header.dart';
 import '../../../../core/widgets/bottom_navbar.dart';
-import '../widgets/product_list_header.dart';
 import '../widgets/product_card_new.dart';
 import '../../../../models/products.dart';
 
@@ -30,7 +30,7 @@ class _ProductPageState extends State<ProductPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const ProductListHeader(),
+            const AppHeader(title: 'PhotoKart', showSearch: true),
             Expanded(
               child: SingleChildScrollView(
                 padding:
@@ -67,13 +67,4 @@ class _ProductPageState extends State<ProductPage> {
       ),
     );
   }
-}
-
-void main() {
-  runApp(
-    MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: const ProductPage(),
-    ),
-  );
 }

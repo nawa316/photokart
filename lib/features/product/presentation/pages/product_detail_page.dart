@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../models/products.dart';
-import 'edit_product_page.dart';
+import 'seller_edit_product.dart';
 import '../../presentation/widgets/custom_popup.dart';
 
 

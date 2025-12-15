@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/widgets/bottom_navbar.dart';
 import '../../../../core/widgets/search_bar_widget.dart';
+import '../../../../core/widgets/app_header.dart';
 
 class OrderListPage extends StatefulWidget {
   const OrderListPage({super.key});
@@ -21,83 +22,8 @@ class _OrderListPageState extends State<OrderListPage> {
       backgroundColor: const Color(0xFFF7FAFE),
       body: Column(
         children: [
-          // Header dengan gradient
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.fromLTRB(
-              18,
-              paddingTop + 12,
-              18,
-              18,
-            ),
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xFFCFD5FF),
-                  Color(0xFFF7FAFE),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(32),
-                bottomRight: Radius.circular(32),
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Back Button dan Title
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () => context.pop(),
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        child: const Row(
-                          children: [
-                            Icon(
-                              Icons.arrow_back_ios,
-                              size: 16,
-                              color: Color(0xFF7B95CF),
-                            ),
-                            SizedBox(width: 4),
-                            Text(
-                              'Back',
-                              style: TextStyle(
-                                color: Color(0xFF7B95CF),
-                                fontSize: 14,
-                                fontFamily: 'Poppins',
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const Spacer(),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                // PhotoKart Title
-                const Text(
-                  'PhotoKart',
-                  style: TextStyle(
-                    color: Color(0xFF304369),
-                    fontSize: 24,
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                // Search Bar
-                const SearchBarWidget(),
-              ],
-            ),
-          ),
-
-          // Content
-          Expanded(
+          const AppHeader(title: 'PhotoKart', showSearch: true),
+            Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(18),
               child: Column(
