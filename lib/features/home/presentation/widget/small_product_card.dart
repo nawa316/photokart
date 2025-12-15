@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../product/domain/product_model.dart';
 
 class SmallProductCard extends StatelessWidget {
@@ -16,13 +17,19 @@ class SmallProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFFBFB),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0x7F7B95CF)),
-      ),
-      child: Column(
+    return GestureDetector(
+      onTap: () {
+        if (product.id != null) {
+          context.push('/buyer-product/${product.id}');
+        }
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFFBFB),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: const Color(0x7F7B95CF)),
+        ),
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           AspectRatio(
@@ -100,8 +107,7 @@ class SmallProductCard extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
+      ),      ),    );
   }
 
   Widget _buildProductImage(String imageUrl) {

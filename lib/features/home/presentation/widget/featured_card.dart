@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../product/domain/product_model.dart';
 
 class FeaturedCard extends StatelessWidget {
@@ -7,12 +8,18 @@ class FeaturedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.center,
-      child: SizedBox(
-        width: 320,
-        child: Container(
-          decoration: BoxDecoration(
+    return GestureDetector(
+      onTap: () {
+        if (product.id != null) {
+          context.push('/buyer-product/${product.id}');
+        }
+      },
+      child: Align(
+        alignment: Alignment.center,
+        child: SizedBox(
+          width: 320,
+          child: Container(
+            decoration: BoxDecoration(
             color: const Color(0xFFFFFBFB),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(color: const Color(0x7F7B95CF)),
@@ -83,6 +90,7 @@ class FeaturedCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
       ),
     );
   }

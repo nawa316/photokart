@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../product/domain/product_model.dart';
 
 class TopSalesList extends StatelessWidget {
@@ -24,26 +25,33 @@ class TopSalesList extends StatelessWidget {
         separatorBuilder: (_, __) => const SizedBox(width: 14),
         itemBuilder: (context, index) {
           final item = products[index];
-          return SizedBox(
-            width: 92,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: _buildProductCard(item, index),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  item.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Color(0xFF304369),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
+          return GestureDetector(
+            onTap: () {
+              if (item.id != null) {
+                context.push('/buyer-product/${item.id}');
+              }
+            },
+            child: SizedBox(
+              width: 92,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: _buildProductCard(item, index),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 6),
+                  Text(
+                    item.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Color(0xFF304369),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         },

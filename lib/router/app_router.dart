@@ -1,5 +1,5 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:photokart/models/products.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../features/auth/presentation/pages/onboarding_page.dart';
 import '../features/auth/presentation/pages/login_page.dart';
@@ -14,7 +14,11 @@ import '../features/product/presentation/pages/seller_addproduct.dart';
 import '../features/product/presentation/pages/productpage.dart';
 import '../features/product/presentation/pages/edit_product_wrapper.dart';
 import '../features/product/presentation/pages/product_detail_wrapper.dart';
+import '../features/product/presentation/pages/buyer_product_detail_page.dart';
+import '../features/product/data/product_repository.dart';
 import '../features/order/presentation/pages/order_list_page.dart';
+import '../features/order/presentation/pages/order_detail_page.dart';
+import '../features/product/domain/product_model.dart';
 
 final GoRouter appRouter = GoRouter(
   routes: [
@@ -95,11 +99,60 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) => const OrderListPage(),
     ),
     GoRoute(
+      name: 'order-detail',
+      path: '/order/detail',
+      builder: (context, state) {
+        final product = state.extra as ProductModel;
+        final quantity = state.uri.queryParameters['quantity'];
+        return OrderDetailPage(
+          product: product,
+          quantity: quantity != null ? int.parse(quantity) : 1,
+        );
+      },
+    ),
+    GoRoute(
       name: 'product-detail',
       path: '/product/:id',
       builder: (context, state) {
         final id = state.pathParameters['id'] ?? '';
         return ProductDetailWrapper(productId: id);
+      },
+    ),
+    GoRoute(
+      name: 'buyer-product-detail',
+      path: '/buyer-product/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'] ?? '';
+        return FutureBuilder(
+          future: ProductRepository().getProductById(id),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Scaffold(
+                backgroundColor: Color(0xFFF7FAFE),
+                body: Center(child: CircularProgressIndicator()),
+              );
+            }
+            if (snapshot.hasError || snapshot.data == null) {
+              return Scaffold(
+                backgroundColor: const Color(0xFFF7FAFE),
+                body: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text('Product not found'),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () => context.pop(),
+                        child: const Text('Go Back'),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+            return BuyerProductDetailPage(product: snapshot.data!);
+          },
+        );
       },
     ),
   ],

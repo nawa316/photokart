@@ -27,7 +27,7 @@ class AuthRepositoryImpl implements AuthRepository {
       );
       return Right(user);
     } catch (e) {
-      return Left(AuthFailure(e.toString()));
+      return Left(AuthFailure(message: e.toString()));
     }
   }
 
@@ -43,7 +43,7 @@ class AuthRepositoryImpl implements AuthRepository {
       );
       return Right(user);
     } catch (e) {
-      return Left(AuthFailure(e.toString()));
+      return Left(AuthFailure(message: e.toString()));
     }
   }
 
@@ -53,7 +53,7 @@ class AuthRepositoryImpl implements AuthRepository {
       await _authApi.logout();
       return const Right(null);
     } catch (e) {
-      return Left(AuthFailure(e.toString()));
+      return Left(AuthFailure(message: e.toString()));
     }
   }
 
@@ -63,7 +63,7 @@ class AuthRepositoryImpl implements AuthRepository {
       final user = await _authApi.getCurrentUser();
       return Right(user);
     } catch (e) {
-      return Left(AuthFailure(e.toString()));
+      return Left(AuthFailure(message: e.toString()));
     }
   }
 
