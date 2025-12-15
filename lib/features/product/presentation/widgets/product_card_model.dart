@@ -12,7 +12,7 @@ class ProductCardModel extends StatelessWidget {
     final parts = priceStr.split('.');
     final intPart = parts[0];
     final decPart = parts[1];
-    
+
     // Add thousand separators
     String formatted = '';
     int count = 0;
@@ -23,7 +23,7 @@ class ProductCardModel extends StatelessWidget {
       formatted = intPart[i] + formatted;
       count++;
     }
-    
+
     return 'RP. $formatted,$decPart';
   }
 
@@ -31,25 +31,13 @@ class ProductCardModel extends StatelessWidget {
     // Return gradient colors based on rarity
     switch (rarity.toLowerCase()) {
       case 'rare':
-        return [
-          const Color(0xFFFDE7EA),
-          const Color(0xFFFFECEF),
-        ];
+        return [const Color(0xFFFDE7EA), const Color(0xFFFFECEF)];
       case 'epic':
-        return [
-          const Color(0xFFFEE6F6),
-          const Color(0xFFFFF0FB),
-        ];
+        return [const Color(0xFFFEE6F6), const Color(0xFFFFF0FB)];
       case 'legendary':
-        return [
-          const Color(0xFFE5F3FF),
-          const Color(0xFFF1F8FF),
-        ];
+        return [const Color(0xFFE5F3FF), const Color(0xFFF1F8FF)];
       default:
-        return [
-          const Color(0xFFF4E7FF),
-          const Color(0xFFF9F0FF),
-        ];
+        return [const Color(0xFFF4E7FF), const Color(0xFFF9F0FF)];
     }
   }
 
@@ -62,7 +50,11 @@ class ProductCardModel extends StatelessWidget {
     final fontNormal = w * 0.030;
     final fontBig = w * 0.033;
 
-    return Container(
+    return GestureDetector(
+      onTap: () {
+        context.push('/buyer-product/${product.id}');
+      },
+      child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -204,7 +196,7 @@ class ProductCardModel extends StatelessWidget {
             ],
           ),
         ),
-      );
+      ),
+    );
   }
 }
-
