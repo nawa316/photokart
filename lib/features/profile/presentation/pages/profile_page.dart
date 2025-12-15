@@ -400,7 +400,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               const SizedBox(height: 12),
                               _MenuItemCard(
                                 icon: Icons.attach_money,
-                                title: 'Revenue',
+                                title: 'Statistics',
                                 onTap: () => context.go('/revenue'),
                               ),
                               const SizedBox(height: 12),
