@@ -18,18 +18,25 @@ class UserProfile {
     required this.phone,
     required this.password,
     String? avatarPath,
-  }) : avatarPath =
-            (avatarPath == null || avatarPath.isEmpty) ? kDefaultAvatarPath : avatarPath;
+  }) : avatarPath = (avatarPath == null || avatarPath.isEmpty)
+           ? kDefaultAvatarPath
+           : avatarPath;
 
   /// Map untuk update ke Supabase (tabel users)
   Map<String, dynamic> toUpdateMap() {
-    return {
-      'username': name,        // kolom username
-      'email': email,          // kolom email
-      'phone': phone,          // kolom phone
-      'avatarUrl': avatarPath, // kolom avatarUrl
+    final map = {
+      'username': name, // kolom username
+      'email': email, // kolom email
+      'phone': phone, // kolom phone
       // role di-handle terpisah di profile_page (Switch Role)
     };
+
+    // Only include avatarUrl if it's not the default asset
+    if (avatarPath != kDefaultAvatarPath && !avatarPath.startsWith('assets/')) {
+      map['avatarUrl'] = avatarPath;
+    }
+
+    return map;
   }
 
   /// Baca dari row Supabase (tabel users)
