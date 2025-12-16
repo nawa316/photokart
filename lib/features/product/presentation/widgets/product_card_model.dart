@@ -4,7 +4,8 @@ import '../../domain/product_model.dart';
 
 class ProductCardModel extends StatelessWidget {
   final ProductModel product;
-  const ProductCardModel({super.key, required this.product});
+  final VoidCallback? onTap;
+  const ProductCardModel({super.key, required this.product, this.onTap});
 
   String _formatPrice(double price) {
     // Format price to Indonesian Rupiah format
@@ -51,7 +52,7 @@ class ProductCardModel extends StatelessWidget {
     final fontBig = w * 0.033;
 
     return GestureDetector(
-      onTap: () {
+      onTap: onTap ?? () {
         context.push('/buyer-product/${product.id}');
       },
       child: Container(
