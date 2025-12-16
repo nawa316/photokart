@@ -21,4 +21,8 @@ class ReviewRepository {
       text: text,
     );
   }
+
+  Stream<List<Review>> streamReviewsByProduct(String productId) {
+    return remoteDataSource.streamReviewsByProduct(productId);
+  }
 }

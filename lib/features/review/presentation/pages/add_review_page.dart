@@ -69,7 +69,7 @@ class _AddReviewPageState extends State<AddReviewPage> {
     });
 
     try {
-      await _reviewRepository.createReview(
+      final newReview = await _reviewRepository.createReview(
         productId: widget.productId,
         stars: _selectedRating,
         text: _reviewController.text.trim(),
@@ -82,7 +82,8 @@ class _AddReviewPageState extends State<AddReviewPage> {
             backgroundColor: Color(0xFF4CAF50),
           ),
         );
-        context.pop(true); // Return true to indicate success
+        // Return the new review for optimistic update
+        context.pop(newReview);
       }
     } catch (e) {
       setState(() {

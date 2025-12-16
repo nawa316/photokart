@@ -9,6 +9,7 @@ abstract class ReviewRemoteDataSource {
     required int stars,
     required String text,
   });
+  Stream<List<Review>> streamReviewsByProduct(String productId);
 }
 
 class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
@@ -127,5 +128,49 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
     } catch (e) {
       throw Exception('Failed to create review: $e');
     }
+  }
+
+  @override
+  Stream<List<Review>> streamReviewsByProduct(String productId) {
+    // Stream realtime changes based on primary key
+    final stream = supabaseClient
+        .from('review')
+        .stream(primaryKey: ['id'])
+        .eq('productId', productId)
+        .order('created', ascending: false);
+
+    return stream.asyncMap((rows) async {
+      // Optionally enrich with user info; keep lightweight for realtime
+      final List<Review> list = [];
+      for (final reviewData in rows) {
+        String? username;
+        String? userAvatar;
+        try {
+          final userResponse = await supabaseClient
+              .from('users')
+              .select('username, avatarUrl')
+              .eq('id', reviewData['userId'] as String)
+              .maybeSingle();
+          if (userResponse != null) {
+            username = userResponse['username'] as String?;
+            userAvatar = userResponse['avatarUrl'] as String?;
+          }
+        } catch (_) {}
+
+        list.add(
+          Review(
+            id: reviewData['id'] as String,
+            userId: reviewData['userId'] as String,
+            productId: reviewData['productId'] as String,
+            stars: reviewData['stars'] as int,
+            text: reviewData['text'] as String,
+            created: DateTime.parse(reviewData['created'] as String),
+            username: username,
+            userAvatar: userAvatar,
+          ),
+        );
+      }
+      return list;
+    });
   }
 }
