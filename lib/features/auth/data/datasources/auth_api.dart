@@ -1,4 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import '../../../../core/services/supabase_service.dart';
 import '../../domain/entities/user_model.dart';
 
@@ -159,5 +160,98 @@ class AuthApi {
 
   bool isAuthenticated() {
     return _supabaseService.isAuthenticated;
+  }
+
+  /// ========== GOOGLE SIGN IN ==========
+  /// Authenticate dengan Google dan return email
+  /// Jika user belum ada di database, throw exception khusus
+  Future<String> signInWithGoogle() async {
+    try {
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        scopes: ['email', 'profile'],
+      );
+
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+      if (googleUser == null) {
+        throw Exception('Google sign in cancelled');
+      }
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      // Authenticate ke Supabase menggunakan Google token
+      final response = await _supabaseService.client.auth.signInWithIdToken(
+        provider: OAuthProvider.google,
+        idToken: googleAuth.idToken ?? '',
+      );
+
+      if (response.user == null) {
+        throw Exception('Failed to sign in with Google');
+      }
+
+      // Return email untuk ditampilkan di halaman selanjutnya
+      return googleUser.email;
+    } catch (e) {
+      throw Exception('Google sign in failed: ${e.toString()}');
+    }
+  }
+
+  /// Complete Google registration: simpan data user ke database
+  Future<UserModel> completeGoogleRegistration({
+    required String email,
+    required String username,
+    required String phone,
+  }) async {
+    try {
+      final user = _supabaseService.currentUser;
+      if (user == null) {
+        throw Exception('User not authenticated');
+      }
+
+      // Cek username sudah ada atau tidak
+      final usernameCheck = await _supabaseService.client
+          .from('users')
+          .select('username')
+          .eq('username', username)
+          .limit(1)
+          .maybeSingle();
+
+      if (usernameCheck != null) {
+        throw Exception('Username already taken!');
+      }
+
+      // Insert ke tabel users
+      await _supabaseService.client.from('users').insert({
+        'id': user.id,
+        'username': username,
+        'email': email,
+        'phone': phone,
+        'created_at': DateTime.now().toIso8601String(),
+      });
+
+      // Ambil data user yang baru dibuat
+      final userProfile = await _supabaseService.client
+          .from('users')
+          .select()
+          .eq('id', user.id)
+          .single();
+
+      return UserModel.fromJson(userProfile);
+    } on AuthException catch (e) {
+      throw Exception(e.message);
+    } catch (e) {
+      throw Exception(e.toString().replaceAll('Exception: ', ''));
+    }
+  }
+
+  /// Sign out dari Google dan Supabase
+  Future<void> signOutGoogle() async {
+    try {
+      final GoogleSignIn googleSignIn = GoogleSignIn();
+      await googleSignIn.signOut();
+      await _supabaseService.client.auth.signOut();
+    } catch (e) {
+      throw Exception('Sign out failed: $e');
+    }
   }
 }

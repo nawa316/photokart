@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../features/auth/presentation/pages/onboarding_page.dart';
 import '../features/auth/presentation/pages/login_page.dart';
 import '../features/auth/presentation/pages/register_page.dart';
+import '../features/auth/presentation/pages/google_complete_profile_page.dart';
 import '../features/auth/presentation/pages/email_verification_page.dart';
 import '../features/home/presentation/pages/homepage.dart';
 import '../features/product/presentation/pages/top_sales.dart';
@@ -40,6 +41,13 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/register',
       builder: (context, state) => const RegisterPage(),
+    ),
+    GoRoute(
+      path: '/google-complete-profile',
+      builder: (context, state) {
+        final email = state.extra as String? ?? '';
+        return GoogleCompleteProfilePage(email: email);
+      },
     ),
     GoRoute(
       name: 'email-verification',
@@ -199,15 +207,19 @@ final GoRouter appRouter = GoRouter(
       '/login',
       '/register',
       '/onboarding',
+      '/google-complete-profile',
     ];
 
     // Allow email-verification page without session
     final isEmailVerification =
         state.uri.path.startsWith('/email-verification');
+    final isGoogleCompleteProfile =
+        state.uri.path.startsWith('/google-complete-profile');
 
     if (session == null &&
         !allowedPaths.contains(state.uri.path) &&
-        !isEmailVerification) {
+        !isEmailVerification &&
+        !isGoogleCompleteProfile) {
       return '/onboarding';
     }
     return null;

@@ -212,63 +212,10 @@ class _OnboardingPageState extends State<OnboardingPage> {
   final w = size.width;
 
   if (_currentPage == 2) {
-    // Page 3: Google Sign In + Create Account + Sign In Text
+    // Page 3: Create Account + Sign In Text
     return Column(
       children: [
-        // Google Sign In Button
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: w * 0.08),
-          child: SizedBox(
-            width: double.infinity,
-            height: h * 0.055, // SAMA dengan Create Account
-            child: ElevatedButton(
-              onPressed: () {
-                // TODO: handle Google sign-in
-              },
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.zero,
-                backgroundColor: Colors.white,
-                elevation: 4,
-                shadowColor: Colors.black26,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(40),
-                ),
-              ),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  // TEKS TETAP DI TENGAH
-                  const Center(
-                    child: Text(
-                      'Sign in with google',
-                      style: TextStyle(
-                        color: Color(0xFF7B95CF),
-                        fontSize: 16,
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  // IKON DI KIRI
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 20),
-                      child: Image.asset(
-                        'assets/images/google.png',
-                        height: 22,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        SizedBox(height: h * 0.015),
-
-        // Create Account Button (BIARKAN seperti sebelumnya)
+        // Create Account Button
         Padding(
           padding: EdgeInsets.symmetric(horizontal: w * 0.08),
           child: SizedBox(
