@@ -6,6 +6,7 @@ class Message {
   final String userId;
   final String convoId;
   final bool isSentByMe;
+  final bool isRead;
 
   const Message({
     required this.id,
@@ -15,5 +16,6 @@ class Message {
     required this.userId,
     required this.convoId,
     this.isSentByMe = false,
+    this.isRead = false,
   });
 }

@@ -9,6 +9,7 @@ class MessageModel extends Message {
     required super.userId,
     required super.convoId,
     super.isSentByMe,
+    super.isRead,
   });
 
   factory MessageModel.fromJson(Map<String, dynamic> json, {String? currentUserId}) {
@@ -21,6 +22,7 @@ class MessageModel extends Message {
       userId: userId,
       convoId: json['convoId'] as String,
       isSentByMe: currentUserId != null && userId == currentUserId,
+      isRead: json['isRead'] as bool? ?? false,
     );
   }
 
@@ -32,6 +34,7 @@ class MessageModel extends Message {
       'sent': sent.toIso8601String(),
       'userId': userId,
       'convoId': convoId,
+      'isRead': isRead,
     };
   }
 
@@ -44,6 +47,7 @@ class MessageModel extends Message {
       userId: message.userId,
       convoId: message.convoId,
       isSentByMe: message.isSentByMe,
+      isRead: message.isRead,
     );
   }
 }

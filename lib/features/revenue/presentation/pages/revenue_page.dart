@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/widgets/app_header.dart';
@@ -198,6 +199,33 @@ class _RevenuePageState extends State<RevenuePage> {
             searchController: _searchController,
             searchHint: 'Search transactions',
             onSearchChanged: (v) => setState(() => _searchQuery = v),
+          ),
+          const SizedBox(height: 12),
+          // Back button above Daily/Weekly/Monthly
+          Padding(
+            padding: const EdgeInsets.only(left: 16, bottom: 12),
+            child: GestureDetector(
+              onTap: () => context.go('/profile'),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.arrow_back_ios,
+                    color: Color(0xFF7B95CF),
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Back',
+                    style: TextStyle(
+                      color: Color(0xFF7B95CF),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
           const SizedBox(height: 12),
           _PeriodSelector(
