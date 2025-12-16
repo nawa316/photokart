@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/widgets/bottom_navbar.dart';
@@ -270,7 +271,7 @@ class _OrderListPageState extends State<OrderListPage> {
     return GestureDetector(
       onTap: () {
         // Navigate to order detail page
-        // context.push('/order/${transaction.id}');
+        context.push('/order/${transaction.id}');
       },
       child: Container(
         padding: const EdgeInsets.all(16),

@@ -212,7 +212,7 @@ class BuyerProductDetailPage extends StatelessWidget {
                     elevation: 2,
                   ),
                   child: const Text(
-                    'Buy Now',
+                    'Place Order',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 16,

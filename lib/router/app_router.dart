@@ -9,6 +9,7 @@ import '../features/home/presentation/pages/homepage.dart';
 import '../features/product/presentation/pages/top_rating.dart';
 import '../features/review/presentation/pages/reviewpage.dart';
 import '../features/chat/presentation/pages/chat_overview.dart';
+import '../features/chat/presentation/pages/chat_detail_page.dart';
 import '../features/profile/presentation/pages/profile_page.dart';
 import '../features/product/presentation/pages/seller_addproduct.dart';
 import '../features/product/presentation/pages/productpage.dart';
@@ -18,6 +19,8 @@ import '../features/product/presentation/pages/buyer_product_detail_page.dart';
 import '../features/product/data/product_repository.dart';
 import '../features/order/presentation/pages/order_list_page.dart';
 import '../features/order/presentation/pages/order_detail_page.dart';
+import '../features/order/presentation/pages/buyer_order_confirmation.dart';
+import '../features/order/presentation/pages/order_view_page.dart';
 import '../features/product/domain/product_model.dart';
 import '../features/revenue/presentation/pages/revenue_page.dart';
 
@@ -67,6 +70,22 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) => const ChatOverviewPage(),
     ),
     GoRoute(
+      name: 'chat-detail',
+      path: '/chat/:conversationId',
+      builder: (context, state) {
+        final conversationId = state.pathParameters['conversationId'] ?? '';
+        final extra = state.extra as Map<String, dynamic>?;
+        final username = extra?['username'] as String? ?? 'User';
+        final platformKey = extra?['platformKey'] as String? ?? 'chat';
+        
+        return ChatDetailPage(
+          conversationId: conversationId,
+          username: username,
+          platformKey: platformKey,
+        );
+      },
+    ),
+    GoRoute(
       name: 'profile',
       path: '/profile',
       builder: (context, state) => const ProfilePage(),
@@ -100,6 +119,21 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) => const OrderListPage(),
     ),
     GoRoute(
+      name: 'order-confirmation',
+      path: '/order/confirmation',
+      builder: (context, state) {
+        final data = state.extra as Map<String, dynamic>;
+        final transactionId = data['transactionId'] as String;
+        final product = data['product'] as ProductModel;
+        final quantity = state.uri.queryParameters['quantity'];
+        return BuyerOrderConfirmationPage(
+          transactionId: transactionId,
+          product: product,
+          quantity: quantity != null ? int.parse(quantity) : 1,
+        );
+      },
+    ),
+    GoRoute(
       name: 'order-detail',
       path: '/order/detail',
       builder: (context, state) {
@@ -109,6 +143,14 @@ final GoRouter appRouter = GoRouter(
           product: product,
           quantity: quantity != null ? int.parse(quantity) : 1,
         );
+      },
+    ),
+    GoRoute(
+      name: 'order-view',
+      path: '/order/:transactionId',
+      builder: (context, state) {
+        final transactionId = state.pathParameters['transactionId'] ?? '';
+        return OrderViewPage(transactionId: transactionId);
       },
     ),
     GoRoute(

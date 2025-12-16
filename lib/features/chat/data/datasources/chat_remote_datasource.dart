@@ -1,4 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:uuid/uuid.dart';
 import '../models/conversation_model.dart';
 import '../models/message_model.dart';
 
@@ -146,7 +147,12 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
       final userId = _currentUserId;
       if (userId == null) throw Exception('User not authenticated');
 
+      // Generate UUID for message
+      const uuid = Uuid();
+      final messageId = uuid.v4();
+
       final messageData = {
+        'id': messageId,
         'text': text,
         'photoUrl': photoUrl,
         'sent': DateTime.now().toIso8601String(),

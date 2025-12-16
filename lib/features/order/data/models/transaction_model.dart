@@ -57,12 +57,10 @@ class TransactionModel extends Transaction {
     switch (status.toLowerCase()) {
       case 'awaiting':
         return TransactionStatus.awaiting;
-      case 'pending':
-        return TransactionStatus.pending;
-      case 'processing':
-        return TransactionStatus.processing;
-      case 'shipped':
-        return TransactionStatus.shipped;
+      case 'processed':
+        return TransactionStatus.processed;
+      case 'on_shipped':
+        return TransactionStatus.on_shipped;
       case 'completed':
         return TransactionStatus.completed;
       case 'cancelled':

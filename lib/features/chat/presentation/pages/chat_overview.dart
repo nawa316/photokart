@@ -218,6 +218,7 @@ class _ChatOverviewPageState extends State<ChatOverviewPage> {
                                   time: _formatTime(conversation.lastMessageTime),
                                   unreadCount: conversation.unreadCount,
                                   platformKey: platform,
+                                  onReturn: _loadConversations,
                                 );
                               },
                             ),
@@ -257,6 +258,7 @@ class ChatMessageTile extends StatelessWidget {
   final String time;
   final int unreadCount;
   final String platformKey;
+  final VoidCallback? onReturn;
 
   const ChatMessageTile({
     super.key,
@@ -266,6 +268,7 @@ class ChatMessageTile extends StatelessWidget {
     required this.time,
     required this.unreadCount,
     required this.platformKey,
+    this.onReturn,
   });
 
   LinearGradient _getGradient(String key) {
@@ -281,8 +284,8 @@ class ChatMessageTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
+      onTap: () async {
+        await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => ChatDetailPage(
@@ -292,6 +295,10 @@ class ChatMessageTile extends StatelessWidget {
             ),
           ),
         );
+        // Refresh the conversation list when returning
+        if (onReturn != null) {
+          onReturn!();
+        }
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 13, left: 20, right: 20),

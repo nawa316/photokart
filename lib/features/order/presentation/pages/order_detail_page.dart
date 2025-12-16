@@ -98,7 +98,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                 const SizedBox(height: 12),
                 // Message
                 const Text(
-                  'Are you sure you want to buy\nthis PhotoCard?',
+                  'Are you sure you want to order\nthis PhotoCard?',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Color(0xFF6B7280),
