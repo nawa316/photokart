@@ -15,7 +15,6 @@ class AuthRepositoryImpl implements AuthRepository {
     required String email,
     required String phone,
     required String password,
-    required String role,
   }) async {
     try {
       final user = await _authApi.register(
@@ -23,7 +22,6 @@ class AuthRepositoryImpl implements AuthRepository {
         email: email,
         phone: phone,
         password: password,
-        role: role,
       );
       return Right(user);
     } catch (e) {

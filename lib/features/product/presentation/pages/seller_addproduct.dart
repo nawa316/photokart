@@ -56,7 +56,7 @@ class _AddProductPageState extends State<AddProductPage> {
   final TextEditingController stockController =
       TextEditingController(text: "0");
   final TextEditingController priceController =
-      TextEditingController(text: "Rp. 0");
+      TextEditingController(text: "0");
   
   // Add rarity state variable
   ProductRarity? _selectedRarity;
@@ -150,7 +150,7 @@ class _AddProductPageState extends State<AddProductPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Product added successfully')),
       );
-      Navigator.of(context).pop();
+      Navigator.of(context).pop(true); // Pop with success indicator
     } catch (e) {
       Navigator.of(context).pop(); // remove loading
       ScaffoldMessenger.of(context).showSnackBar(
@@ -420,7 +420,7 @@ class _AddProductPageState extends State<AddProductPage> {
                     const SizedBox(height: 6),
                     _buildTextField(
                       controller: priceController,
-                      hint: "Rp. 0",
+                      hint: "0",
                       keyboardType: TextInputType.number,
                     ),
 

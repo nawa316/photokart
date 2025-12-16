@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../domain/product_model.dart';
 import '../../data/product_repository.dart';
-import 'product_detail_page.dart';
+import 'seller_product_detail_page.dart';
 
 class ProductDetailWrapper extends StatelessWidget {
   final String productId;

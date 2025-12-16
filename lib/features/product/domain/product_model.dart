@@ -72,4 +72,9 @@ class ProductModel {
           : 0,
     );
   }
+
+  /// Create ProductModel from JSON (alias for fromMap)
+  factory ProductModel.fromJson(Map<String, dynamic> json) {
+    return ProductModel.fromMap(json);
+  }
 }

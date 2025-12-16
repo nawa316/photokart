@@ -24,12 +24,23 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   String? _orderId;
   bool _isCreatingOrder = false;
 
-  final List<Map<String, dynamic>> _cardTypes = [
+  final List<Map<String, dynamic>> _allCardTypes = [
     {'name': 'BRI', 'icon': Icons.account_balance},
     {'name': 'Mandiri', 'icon': Icons.account_balance},
     {'name': 'BNI', 'icon': Icons.account_balance},
     {'name': 'BSI', 'icon': Icons.account_balance},
+    {'name': 'BCA', 'icon': Icons.account_balance},
+    {'name': 'CIMB Niaga', 'icon': Icons.account_balance},
+    {'name': 'Permata', 'icon': Icons.account_balance},
+    {'name': 'Danamon', 'icon': Icons.account_balance},
+    {'name': 'OCBC NISP', 'icon': Icons.account_balance},
+    {'name': 'Panin', 'icon': Icons.account_balance},
+    {'name': 'BTN', 'icon': Icons.account_balance},
+    {'name': 'Mega', 'icon': Icons.account_balance},
+    {'name': 'Bukopin', 'icon': Icons.account_balance},
     {'name': 'Visa', 'icon': Icons.credit_card},
+    {'name': 'Mastercard', 'icon': Icons.credit_card},
+    {'name': 'American Express', 'icon': Icons.credit_card},
   ];
 
   @override
@@ -303,110 +314,16 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
+      isScrollControlled: true,
       builder: (BuildContext context) {
-        return Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-            ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: 12),
-              Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              const SizedBox(height: 20),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24),
-                child: Text(
-                  'Choose your card type',
-                  style: TextStyle(
-                    color: Color(0xFF304369),
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Flexible(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: _cardTypes.length,
-                  itemBuilder: (context, index) {
-                    final cardType = _cardTypes[index];
-                    return ListTile(
-                      leading: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF7FAFE),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          cardType['icon'],
-                          color: const Color(0xFF7B95CF),
-                          size: 24,
-                        ),
-                      ),
-                      title: Text(
-                        cardType['name'],
-                        style: const TextStyle(
-                          color: Color(0xFF304369),
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      onTap: () {
-                        setState(() {
-                          _selectedCardType = cardType['name'];
-                        });
-                        Navigator.pop(context);
-                      },
-                    );
-                  },
-                ),
-              ),
-              const Divider(height: 1),
-              ListTile(
-                leading: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF7FAFE),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Icon(
-                    Icons.search,
-                    color: Color(0xFF7B95CF),
-                    size: 24,
-                  ),
-                ),
-                title: const Text(
-                  'Search another bank',
-                  style: TextStyle(
-                    color: Color(0xFF6B7280),
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  // TODO: Implement search functionality
-                },
-              ),
-              const SizedBox(height: 24),
-            ],
-          ),
+        return _CardTypeBottomSheet(
+          allCardTypes: _allCardTypes,
+          selectedCardType: _selectedCardType,
+          onCardTypeSelected: (String cardType) {
+            setState(() {
+              _selectedCardType = cardType;
+            });
+          },
         );
       },
     );
@@ -794,5 +711,213 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   void dispose() {
     _addressController.dispose();
     super.dispose();
+  }
+}
+
+// Separate StatefulWidget for the bottom sheet to handle search
+class _CardTypeBottomSheet extends StatefulWidget {
+  final List<Map<String, dynamic>> allCardTypes;
+  final String selectedCardType;
+  final Function(String) onCardTypeSelected;
+
+  const _CardTypeBottomSheet({
+    required this.allCardTypes,
+    required this.selectedCardType,
+    required this.onCardTypeSelected,
+  });
+
+  @override
+  State<_CardTypeBottomSheet> createState() => _CardTypeBottomSheetState();
+}
+
+class _CardTypeBottomSheetState extends State<_CardTypeBottomSheet> {
+  final TextEditingController _searchController = TextEditingController();
+  List<Map<String, dynamic>> _filteredCardTypes = [];
+  bool _isSearching = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _filteredCardTypes = widget.allCardTypes;
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _filterCardTypes(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _filteredCardTypes = widget.allCardTypes;
+        _isSearching = false;
+      } else {
+        _isSearching = true;
+        _filteredCardTypes = widget.allCardTypes
+            .where((card) =>
+                card['name'].toString().toLowerCase().contains(query.toLowerCase()))
+            .toList();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.8,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: 12),
+          // Handle bar
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(height: 20),
+          // Title
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24),
+            child: Text(
+              'Choose your card type',
+              style: TextStyle(
+                color: Color(0xFF304369),
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Search bar
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: TextField(
+              controller: _searchController,
+              onChanged: _filterCardTypes,
+              decoration: InputDecoration(
+                hintText: 'Search bank name...',
+                hintStyle: const TextStyle(color: Color(0xFF9CA3AF)),
+                prefixIcon: const Icon(
+                  Icons.search,
+                  color: Color(0xFF7B95CF),
+                ),
+                suffixIcon: _isSearching
+                    ? IconButton(
+                        icon: const Icon(Icons.clear, color: Color(0xFF9CA3AF)),
+                        onPressed: () {
+                          _searchController.clear();
+                          _filterCardTypes('');
+                        },
+                      )
+                    : null,
+                filled: true,
+                fillColor: const Color(0xFFF7FAFE),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Scrollable list of banks
+          Flexible(
+            child: _filteredCardTypes.isEmpty
+                ? Padding(
+                    padding: const EdgeInsets.all(32),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.search_off,
+                          size: 48,
+                          color: Colors.grey[400],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No bank found',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    shrinkWrap: true,
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    itemCount: _filteredCardTypes.length,
+                    itemBuilder: (context, index) {
+                      final cardType = _filteredCardTypes[index];
+                      final isSelected = cardType['name'] == widget.selectedCardType;
+                      
+                      return ListTile(
+                        leading: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: isSelected 
+                                ? const Color(0xFF7B95CF).withOpacity(0.1)
+                                : const Color(0xFFF7FAFE),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            cardType['icon'],
+                            color: isSelected 
+                                ? const Color(0xFF7B95CF)
+                                : const Color(0xFF9CA3AF),
+                            size: 24,
+                          ),
+                        ),
+                        title: Text(
+                          cardType['name'],
+                          style: TextStyle(
+                            color: isSelected 
+                                ? const Color(0xFF304369)
+                                : const Color(0xFF6B7280),
+                            fontSize: 16,
+                            fontWeight: isSelected 
+                                ? FontWeight.w600 
+                                : FontWeight.w500,
+                          ),
+                        ),
+                        trailing: isSelected
+                            ? const Icon(
+                                Icons.check_circle,
+                                color: Color(0xFF7B95CF),
+                                size: 24,
+                              )
+                            : null,
+                        onTap: () {
+                          widget.onCardTypeSelected(cardType['name']);
+                          Navigator.pop(context);
+                        },
+                      );
+                    },
+                  ),
+          ),
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
   }
 }

@@ -55,6 +55,9 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
         _isLoading = false;
       });
 
+      // Mark messages as read
+      await _chatRepository.markAsRead(widget.conversationId);
+
       // Scroll to bottom after loading
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (_scrollController.hasClients) {
@@ -218,6 +221,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                                 message: message.text,
                                 isSentByMe: message.isSentByMe,
                                 timestamp: message.sent,
+                                isRead: message.isRead,
                               );
                             },
                           ),
@@ -312,16 +316,17 @@ class MessageBubble extends StatelessWidget {
   final String message;
   final bool isSentByMe;
   final DateTime timestamp;
+  final bool isRead;
 
   const MessageBubble({
     super.key,
     required this.message,
     required this.isSentByMe,
     required this.timestamp,
+    this.isRead = false,
   });
 
   String _formatTime(DateTime time) {
-    final hour = time.hour.toString().padLeft(2, '0');
     final minute = time.minute.toString().padLeft(2, '0');
     final period = time.hour >= 12 ? 'PM' : 'AM';
     final displayHour = time.hour > 12 ? time.hour - 12 : (time.hour == 0 ? 12 : time.hour);
@@ -356,34 +361,68 @@ class MessageBubble extends StatelessWidget {
             children: [
               if (isSentByMe) const SizedBox(width: 50),
               Flexible(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  decoration: BoxDecoration(
-                    gradient: isSentByMe
-                        ? const LinearGradient(
-                            colors: [Color(0xFFFCDFF5), Color(0xFFF9F1F6)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          )
-                        : const LinearGradient(
-                            colors: [Color(0xFFC2E7FF), Color(0xFFE3F2FD)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                    borderRadius: BorderRadius.only(
-                      topLeft: const Radius.circular(16),
-                      topRight: const Radius.circular(16),
-                      bottomLeft: Radius.circular(isSentByMe ? 16 : 4),
-                      bottomRight: Radius.circular(isSentByMe ? 4 : 16),
+                child: Column(
+                  crossAxisAlignment: isSentByMe 
+                      ? CrossAxisAlignment.end 
+                      : CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        gradient: isSentByMe
+                            ? const LinearGradient(
+                                colors: [Color(0xFFFCDFF5), Color(0xFFF9F1F6)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              )
+                            : const LinearGradient(
+                                colors: [Color(0xFFC2E7FF), Color(0xFFE3F2FD)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                        borderRadius: BorderRadius.only(
+                          topLeft: const Radius.circular(16),
+                          topRight: const Radius.circular(16),
+                          bottomLeft: Radius.circular(isSentByMe ? 16 : 4),
+                          bottomRight: Radius.circular(isSentByMe ? 4 : 16),
+                        ),
+                      ),
+                      child: Text(
+                        message,
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 14,
+                        ),
+                      ),
                     ),
-                  ),
-                  child: Text(
-                    message,
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 14,
-                    ),
-                  ),
+                    // Read indicator (checkmark) for sent messages
+                    if (isSentByMe)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4, right: 4),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              isRead ? Icons.done_all : Icons.done,
+                              size: 14,
+                              color: isRead 
+                                  ? const Color(0xFF4CAF50) // Green for read
+                                  : Colors.grey, // Grey for sent
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              isRead ? 'Read' : 'Sent',
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: isRead 
+                                    ? const Color(0xFF4CAF50)
+                                    : Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
                 ),
               ),
               if (!isSentByMe) const SizedBox(width: 50),

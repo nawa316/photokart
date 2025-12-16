@@ -105,7 +105,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final supabase = Supabase.instance.client;
     await supabase.auth.signOut();
     if (mounted) {
-      context.go('/onboarding');
+      context.go('/login');
     }
   }
 

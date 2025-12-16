@@ -13,7 +13,6 @@ class AuthApi {
     required String email,
     required String phone,
     required String password,
-    required String role,
   }) async {
     try {
       // 1. CEK DUPLIKAT TERLEBIH DAHULU (PENTING)
@@ -27,7 +26,6 @@ class AuthApi {
         data: {
           'username': username,
           'phone': phone,
-          'role': role,
         },
       );
 
@@ -41,7 +39,6 @@ class AuthApi {
         'username': username,
         'email': email,
         'phone': phone,
-        'role': role,
         'created_at': DateTime.now().toIso8601String(),
       });
 

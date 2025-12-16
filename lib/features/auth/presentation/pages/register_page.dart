@@ -26,7 +26,6 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _obscureConfirmPassword = true;
   bool _isLoading = false;
   String? _errorMessage;
-  String _selectedRole = 'buyer';
 
   late final AuthRepositoryImpl _authRepository;
 
@@ -65,7 +64,6 @@ class _RegisterPageState extends State<RegisterPage> {
       email: _emailController.text.trim().toLowerCase(), // Lowercase agar aman
       phone: _phoneController.text.trim(),
       password: _passwordController.text,
-      role: _selectedRole,
     );
 
     setState(() => _isLoading = false);
@@ -197,23 +195,6 @@ class _RegisterPageState extends State<RegisterPage> {
                             _buildLabel('Phone Number'),
                             const SizedBox(height: 8),
                             _buildTextField(controller: _phoneController, hint: '081232120897', inputType: TextInputType.phone, validator: (v) => (v == null || v.trim().isEmpty) ? 'Please enter phone number' : null),
-                            const SizedBox(height: 16),
-
-                            // Role
-                            _buildLabel('I want to'),
-                            const SizedBox(height: 8),
-                            DropdownButtonFormField<String>(
-                              value: _selectedRole,
-                              decoration: _inputDeco(),
-                              icon: const Icon(Icons.keyboard_arrow_down, color: Color(0xFF304369)),
-                              items: const [
-                                DropdownMenuItem(value: 'buyer', child: Text('Buy Products')),
-                                DropdownMenuItem(value: 'seller', child: Text('Sell Products')),
-                                DropdownMenuItem(value: 'both', child: Text('Buy and Sell Products')),
-                              ],
-                              onChanged: (v) { if (v != null) setState(() => _selectedRole = v); },
-                              style: const TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Color(0xFF304369)),
-                            ),
                             const SizedBox(height: 16),
 
                             // Password

@@ -73,12 +73,13 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
             ? messagesResponse.first as Map<String, dynamic>
             : null;
 
-        // Get unread count - messages from other user that are not from current user
+        // Get unread count - messages from other user that haven't been read
         final unreadMessages = await supabaseClient
             .from('message')
             .select('id')
             .eq('convoId', convoMap['id'])
-            .neq('userId', userId) as List<dynamic>;
+            .neq('userId', userId)
+            .eq('isRead', false) as List<dynamic>;
 
         final unreadCount = unreadMessages.length;
 
@@ -158,6 +159,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
         'sent': DateTime.now().toIso8601String(),
         'userId': userId,
         'convoId': conversationId,
+        'isRead': false,
       };
 
       final response = await supabaseClient
@@ -198,9 +200,16 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   @override
   Future<void> markAsRead(String conversationId) async {
     try {
-      // This would typically update a read_status table or similar
-      // For now, we'll just acknowledge the call
-      // You may need to add a read_status table to track this
+      final userId = _currentUserId;
+      if (userId == null) throw Exception('User not authenticated');
+
+      // Mark all messages in this conversation from other users as read
+      await supabaseClient
+          .from('message')
+          .update({'isRead': true})
+          .eq('convoId', conversationId)
+          .neq('userId', userId)
+          .eq('isRead', false);
     } catch (e) {
       throw Exception('Failed to mark as read: $e');
     }

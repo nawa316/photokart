@@ -165,7 +165,8 @@ class _ProductPageState extends State<ProductPage> {
                                   Column(
                                     children: _products
                                         .map(
-                                          (p) => GestureDetector(
+                                          (p) => ProductCardModel(
+                                            product: p,
                                             onTap: () async {
                                               final result = await context.push('/product/${p.id}');
                                               // Reload if product was edited or deleted
@@ -173,7 +174,6 @@ class _ProductPageState extends State<ProductPage> {
                                                 _loadProducts();
                                               }
                                             },
-                                            child: ProductCardModel(product: p),
                                           ),
                                         )
                                         .toList(),
