@@ -475,6 +475,30 @@ class _BuyerProductDetailPageState extends State<BuyerProductDetailPage> {
                 height: 50,
                 child: ElevatedButton(
                   onPressed: () {
+                    final currentUserId = Supabase.instance.client.auth.currentUser?.id;
+                    
+                    // Check if user is logged in
+                    if (currentUserId == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Please login to place an order'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                      return;
+                    }
+
+                    // Prevent users from buying their own products
+                    if (currentUserId == widget.product.userId) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('You cannot buy your own product'),
+                          backgroundColor: Colors.orange,
+                        ),
+                      );
+                      return;
+                    }
+
                     context.push('/order/detail', extra: widget.product);
                   },
                   style: ElevatedButton.styleFrom(
