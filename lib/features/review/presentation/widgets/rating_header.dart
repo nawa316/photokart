@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class RatingHeader extends StatelessWidget {
-  const RatingHeader({super.key});
+  final String productName;
+  
+  const RatingHeader({super.key, required this.productName});
 
   @override
   Widget build(BuildContext context) {
@@ -64,13 +66,15 @@ class RatingHeader extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 6),
-          const Text(
-            "Product Evaluation",
-            style: TextStyle(
+          Text(
+            productName,
+            style: const TextStyle(
               color: Color(0xFF7B95CF),
               fontSize: 16,
               fontWeight: FontWeight.w500,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),

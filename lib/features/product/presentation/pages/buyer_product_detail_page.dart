@@ -1,10 +1,152 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:uuid/uuid.dart';
 import '../../domain/product_model.dart';
 
-class BuyerProductDetailPage extends StatelessWidget {
+class BuyerProductDetailPage extends StatefulWidget {
   final ProductModel product;
   const BuyerProductDetailPage({super.key, required this.product});
+
+  @override
+  State<BuyerProductDetailPage> createState() => _BuyerProductDetailPageState();
+}
+
+class _BuyerProductDetailPageState extends State<BuyerProductDetailPage> {
+  String? _sellerName;
+  String? _sellerEmail;
+  bool _isLoadingSeller = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSellerInfo();
+  }
+
+  Future<void> _loadSellerInfo() async {
+    try {
+      final supabase = Supabase.instance.client;
+      final sellerResponse = await supabase
+          .from('users')
+          .select('username, email')
+          .eq('id', widget.product.userId)
+          .maybeSingle();
+
+      if (mounted) {
+        setState(() {
+          _sellerName = sellerResponse?['username'] ?? 'Unknown Seller';
+          _sellerEmail = sellerResponse?['email'] ?? 'No email';
+          _isLoadingSeller = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _sellerName = 'Unknown Seller';
+          _sellerEmail = 'No email';
+          _isLoadingSeller = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _handleChatSeller() async {
+    final currentUserId = Supabase.instance.client.auth.currentUser?.id;
+    if (currentUserId == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please login to chat with seller'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+      return;
+    }
+
+    // Don't allow seller to chat with themselves
+    if (currentUserId == widget.product.userId) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('You cannot chat with yourself'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+      return;
+    }
+
+    try {
+      // Show loading
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+
+      final supabase = Supabase.instance.client;
+
+      // Check if conversation already exists
+      final existingConvo = await supabase
+          .from('conversation')
+          .select('id')
+          .or('and(user1Id.eq.$currentUserId,user2Id.eq.${widget.product.userId}),and(user1Id.eq.${widget.product.userId},user2Id.eq.$currentUserId)')
+          .maybeSingle();
+
+      String conversationId;
+
+      if (existingConvo != null) {
+        // Conversation exists
+        conversationId = existingConvo['id'] as String;
+      } else {
+        // Create new conversation with generated UUID
+        const uuid = Uuid();
+        final conversationUuid = uuid.v4();
+        
+        final newConvo = await supabase
+            .from('conversation')
+            .insert({
+              'id': conversationUuid,
+              'user1Id': currentUserId,
+              'user2Id': widget.product.userId,
+            })
+            .select('id')
+            .single();
+        
+        conversationId = newConvo['id'] as String;
+      }
+
+      // Close loading dialog
+      if (mounted) Navigator.pop(context);
+
+      // Navigate to chat detail page
+      if (mounted) {
+        context.push(
+          '/chat/$conversationId',
+          extra: {
+            'username': _sellerName ?? 'Seller',
+            'platformKey': 'product_chat',
+          },
+        );
+      }
+    } catch (e) {
+      // Close loading dialog
+      if (mounted) Navigator.pop(context);
+
+      // Show error
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to open chat: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
 
   String _formatPrice(double price) {
     final value = price.toInt();
@@ -35,7 +177,7 @@ class BuyerProductDetailPage extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24),
                       child: Text(
-                        product.name,
+                        widget.product.name,
                         style: const TextStyle(
                           color: Color(0xFF304369),
                           fontSize: 24,
@@ -61,7 +203,7 @@ class BuyerProductDetailPage extends StatelessWidget {
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(20),
-                          child: _buildProductImage(product.imageUrl),
+                          child: _buildProductImage(widget.product.imageUrl),
                         ),
                       ),
                     ),
@@ -74,7 +216,7 @@ class BuyerProductDetailPage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            _formatPrice(product.price),
+                            _formatPrice(widget.product.price),
                             style: const TextStyle(
                               color: Color(0xFF304369),
                               fontSize: 20,
@@ -85,7 +227,7 @@ class BuyerProductDetailPage extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
-                                'Sales : ${product.sales} pcs',
+                                'Sales : ${widget.product.sales} pcs',
                                 style: const TextStyle(
                                   color: Color(0xFF304369),
                                   fontSize: 14,
@@ -94,7 +236,7 @@ class BuyerProductDetailPage extends StatelessWidget {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                'Stock : ${product.stock} pcs',
+                                'Stock : ${widget.product.stock} pcs',
                                 style: const TextStyle(
                                   color: Color(0xFF304369),
                                   fontSize: 14,
@@ -104,6 +246,112 @@ class BuyerProductDetailPage extends StatelessWidget {
                             ],
                           ),
                         ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    // Seller Information
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF7B95CF).withOpacity(0.1),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            // Seller Avatar
+                            Container(
+                              width: 48,
+                              height: 48,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFEEF2F9),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: const Color(0xFF7B95CF).withOpacity(0.3),
+                                  width: 1,
+                                ),
+                              ),
+                              child: const Icon(
+                                Icons.person,
+                                color: Color(0xFF7B95CF),
+                                size: 28,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            // Seller Info
+                            Expanded(
+                              child: _isLoadingSeller
+                                  ? const Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Loading...',
+                                          style: TextStyle(
+                                            color: Color(0xFF7B95CF),
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  : Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'Seller',
+                                          style: TextStyle(
+                                            color: Color(0xFF7B95CF),
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          _sellerName ?? 'Unknown Seller',
+                                          style: const TextStyle(
+                                            color: Color(0xFF304369),
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          _sellerEmail ?? 'No email',
+                                          style: const TextStyle(
+                                            color: Color(0xFF7B95CF),
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
+                            ),
+                            // Message Button
+                            GestureDetector(
+                              onTap: _handleChatSeller,
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFEEF2F9),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(
+                                  Icons.chat_bubble_outline,
+                                  color: Color(0xFF7B95CF),
+                                  size: 20,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -123,7 +371,7 @@ class BuyerProductDetailPage extends StatelessWidget {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            product.description,
+                            widget.product.description,
                             style: const TextStyle(
                               color: Color(0xFF304369),
                               fontSize: 14,
@@ -137,55 +385,80 @@ class BuyerProductDetailPage extends StatelessWidget {
                     // Rating Section
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFEEF2F9),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: const Color(0x4D7B95CF),
+                      child: GestureDetector(
+                        onTap: () {
+                          context.push(
+                            '/product/${widget.product.id}/reviews',
+                            extra: {
+                              'productId': widget.product.id,
+                              'productName': widget.product.name,
+                              'currentRating': widget.product.rating,
+                            },
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFEEF2F9),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: const Color(0x4D7B95CF),
+                            ),
                           ),
-                        ),
-                        child: Row(
-                          children: [
-                            // Rating Score
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 8,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                product.rating.toStringAsFixed(1),
-                                style: const TextStyle(
-                                  color: Color(0xFF304369),
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w700,
+                          child: Row(
+                            children: [
+                              // Rating Score
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 8,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  widget.product.rating.toStringAsFixed(1),
+                                  style: const TextStyle(
+                                    color: Color(0xFF304369),
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w700,
+                                  ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 16),
-                            // Quality Metrics
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  _buildQualityBar('Good Quality (5%)', 0.05),
-                                  const SizedBox(height: 8),
-                                  _buildQualityBar('Good (10%)', 0.10),
-                                ],
+                              const SizedBox(width: 16),
+                              // Quality Metrics
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${widget.product.reviewCount} Reviews',
+                                      style: const TextStyle(
+                                        color: Color(0xFF304369),
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    const Text(
+                                      'Tap to view all reviews',
+                                      style: TextStyle(
+                                        color: Color(0xFF7B95CF),
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 8),
-                            const Icon(
-                              Icons.arrow_forward_ios,
-                              color: Color(0xFF7B95CF),
-                              size: 16,
-                            ),
-                          ],
+                              const SizedBox(width: 8),
+                              const Icon(
+                                Icons.arrow_forward_ios,
+                                color: Color(0xFF7B95CF),
+                                size: 16,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -202,7 +475,7 @@ class BuyerProductDetailPage extends StatelessWidget {
                 height: 50,
                 child: ElevatedButton(
                   onPressed: () {
-                    context.push('/order/detail', extra: product);
+                    context.push('/order/detail', extra: widget.product);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF7B95CF),
@@ -262,44 +535,6 @@ class BuyerProductDetailPage extends StatelessWidget {
           const SizedBox(width: 48), // Balance the back button
         ],
       ),
-    );
-  }
-
-  Widget _buildQualityBar(String label, double percentage) {
-    return Row(
-      children: [
-        Expanded(
-          flex: 3,
-          child: Text(
-            label,
-            style: const TextStyle(
-              color: Color(0xFF304369),
-              fontSize: 12,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        ),
-        Expanded(
-          flex: 5,
-          child: Container(
-            height: 8,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: FractionallySizedBox(
-              alignment: Alignment.centerLeft,
-              widthFactor: percentage,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xFF7B95CF),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
     );
   }
 

@@ -4,16 +4,16 @@ class ReviewCard extends StatelessWidget {
   final String name;
   final int rating;
   final String reviewText;
-  final String variant;
-  final List<String> imageUrls;
+  final String? timeAgo;
+  final String? userAvatar;
 
   const ReviewCard({
     super.key,
     required this.name,
     required this.rating,
     required this.reviewText,
-    required this.variant,
-    required this.imageUrls,
+    this.timeAgo,
+    this.userAvatar,
   });
 
   @override
@@ -59,7 +59,7 @@ class ReviewCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 2),
-                    _StarRow(count: 5, size: 18),
+                    _StarRow(count: rating, size: 18),
                   ],
                 ),
               ),
@@ -74,41 +74,16 @@ class ReviewCard extends StatelessWidget {
               color: Color(0xff5f6a8a),
             ),
           ),
-          const SizedBox(height: 10),
-          Text(
-            'Variant : $variant',
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: Color(0xff1f2847),
+          if (timeAgo != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              timeAgo!,
+              style: const TextStyle(
+                fontSize: 11,
+                color: Color(0xff9ca3af),
+              ),
             ),
-          ),
-          const SizedBox(height: 10),
-          SizedBox(
-            height: 80,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: imageUrls.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: EdgeInsets.only(
-                    right: index < imageUrls.length - 1 ? 8 : 0,
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: AspectRatio(
-                      aspectRatio: 1,
-                      child: Image.asset(
-                        imageUrls[index],
-                        fit: BoxFit.cover,
-                        width: 80,
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
+          ],
         ],
       ),
     );

@@ -19,7 +19,6 @@ import '../features/product/presentation/pages/buyer_product_detail_page.dart';
 import '../features/product/data/product_repository.dart';
 import '../features/order/presentation/pages/order_list_page.dart';
 import '../features/order/presentation/pages/order_detail_page.dart';
-import '../features/order/presentation/pages/buyer_order_confirmation.dart';
 import '../features/order/presentation/pages/order_view_page.dart';
 import '../features/product/domain/product_model.dart';
 import '../features/revenue/presentation/pages/revenue_page.dart';
@@ -58,11 +57,6 @@ final GoRouter appRouter = GoRouter(
       name: 'top-rating',
       path: '/top-rating',
       builder: (context, state) => const TopRating(),
-    ),
-    GoRoute(
-      name: 'rating-reviews',
-      path: '/reviews',
-      builder: (context, state) => const RatingReviewsPage(),
     ),
     GoRoute(
       name: 'chat-overview',
@@ -117,21 +111,6 @@ final GoRouter appRouter = GoRouter(
       name: 'order',
       path: '/order',
       builder: (context, state) => const OrderListPage(),
-    ),
-    GoRoute(
-      name: 'order-confirmation',
-      path: '/order/confirmation',
-      builder: (context, state) {
-        final data = state.extra as Map<String, dynamic>;
-        final transactionId = data['transactionId'] as String;
-        final product = data['product'] as ProductModel;
-        final quantity = state.uri.queryParameters['quantity'];
-        return BuyerOrderConfirmationPage(
-          transactionId: transactionId,
-          product: product,
-          quantity: quantity != null ? int.parse(quantity) : 1,
-        );
-      },
     ),
     GoRoute(
       name: 'order-detail',
@@ -200,6 +179,21 @@ final GoRouter appRouter = GoRouter(
             }
             return BuyerProductDetailPage(product: snapshot.data!);
           },
+        );
+      },
+    ),
+    GoRoute(
+      path: '/product/:productId/reviews',
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>?;
+        final productId = extra?['productId'] as String? ?? state.pathParameters['productId'] ?? '';
+        final productName = extra?['productName'] as String? ?? 'Product';
+        final currentRating = extra?['currentRating'] as double? ?? 0.0;
+
+        return RatingReviewsPage(
+          productId: productId,
+          productName: productName,
+          currentRating: currentRating,
         );
       },
     ),

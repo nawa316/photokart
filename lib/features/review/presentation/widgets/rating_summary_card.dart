@@ -1,7 +1,18 @@
 import 'package:flutter/material.dart';
 
 class RatingSummaryCard extends StatelessWidget {
-  const RatingSummaryCard({super.key});
+  final double rating;
+  final int totalReviews;
+  final int satisfiedPercentage;
+  final Map<int, int> distribution;
+  
+  const RatingSummaryCard({
+    super.key,
+    required this.rating,
+    required this.totalReviews,
+    required this.satisfiedPercentage,
+    required this.distribution,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -23,9 +34,9 @@ class RatingSummaryCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Text(
-                '4.9',
-                style: TextStyle(
+              Text(
+                rating.toStringAsFixed(1),
+                style: const TextStyle(
                   fontSize: 34,
                   fontWeight: FontWeight.bold,
                   color: Color(0xff1f2847),
@@ -40,7 +51,7 @@ class RatingSummaryCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 10),
-              const _StarRow(count: 5, size: 22),
+              _StarRow(count: rating.round(), size: 22),
               const SizedBox(width: 10),
               Flexible(
                 child: Container(
@@ -50,9 +61,9 @@ class RatingSummaryCard extends StatelessWidget {
                     color: const Color(0xfff4f5fb),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: const Text(
-                    '98% satisfied',
-                    style: TextStyle(
+                  child: Text(
+                    '$satisfiedPercentage% satisfied',
+                    style: const TextStyle(
                       fontSize: 12,
                       color: Color(0xff7f8fa6),
                       fontWeight: FontWeight.w500,
