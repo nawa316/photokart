@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 enum TransactionStatus {
   awaiting,
   processed,
-  on_shipped,
+  on_delivery,
   completed,
   cancelled,
 }
@@ -62,8 +62,8 @@ class Transaction extends Equatable {
         return 'Waiting for Confirmation';
       case TransactionStatus.processed:
         return 'Processed';
-      case TransactionStatus.on_shipped:
-        return 'Shipped';
+      case TransactionStatus.on_delivery:
+        return 'delivery';
       case TransactionStatus.completed:
         return 'Completed';
       case TransactionStatus.cancelled:

@@ -15,8 +15,8 @@ class TopRatingRepository {
       final response = await _supabase
           .from('product')
           .select()
+          .order('sales', ascending: false)
           .order('rating', ascending: false)
-          .order('reviewCount', ascending: false)
           .range(start, end);
 
       final data = response as List<dynamic>? ?? [];

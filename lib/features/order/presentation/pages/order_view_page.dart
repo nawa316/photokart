@@ -134,8 +134,8 @@ class _OrderViewPageState extends State<OrderViewPage> {
         return TransactionStatus.awaiting;
       case 'processed':
         return TransactionStatus.processed;
-      case 'on_shipped':
-        return TransactionStatus.on_shipped;
+      case 'on_delivery':
+        return TransactionStatus.on_delivery;
       case 'completed':
         return TransactionStatus.completed;
       case 'cancelled':
@@ -258,8 +258,8 @@ class _OrderViewPageState extends State<OrderViewPage> {
         case TransactionStatus.processed:
           statusString = 'processed';
           break;
-        case TransactionStatus.on_shipped:
-          statusString = 'on_shipped';
+        case TransactionStatus.on_delivery:
+          statusString = 'on_delivery';
           break;
         case TransactionStatus.completed:
           statusString = 'completed';
@@ -320,9 +320,9 @@ class _OrderViewPageState extends State<OrderViewPage> {
         availableStatuses = [TransactionStatus.processed, TransactionStatus.cancelled];
         break;
       case TransactionStatus.processed:
-        availableStatuses = [TransactionStatus.on_shipped, TransactionStatus.cancelled];
+        availableStatuses = [TransactionStatus.on_delivery, TransactionStatus.cancelled];
         break;
-      case TransactionStatus.on_shipped:
+      case TransactionStatus.on_delivery:
         availableStatuses = [TransactionStatus.completed];
         break;
       case TransactionStatus.completed:
@@ -448,8 +448,8 @@ class _OrderViewPageState extends State<OrderViewPage> {
         return 'Waiting for Checkout';
       case TransactionStatus.processed:
         return 'Processing';
-      case TransactionStatus.on_shipped:
-        return 'Shipped';
+      case TransactionStatus.on_delivery:
+        return 'delivery';
       case TransactionStatus.completed:
         return 'Completed';
       case TransactionStatus.cancelled:
@@ -463,7 +463,7 @@ class _OrderViewPageState extends State<OrderViewPage> {
         return const Color(0xFFFFA726);
       case TransactionStatus.processed:
         return const Color(0xFF42A5F5);
-      case TransactionStatus.on_shipped:
+      case TransactionStatus.on_delivery:
         return const Color(0xFF66BB6A);
       case TransactionStatus.completed:
         return const Color(0xFF4CAF50);
@@ -478,7 +478,7 @@ class _OrderViewPageState extends State<OrderViewPage> {
         return Icons.hourglass_empty;
       case TransactionStatus.processed:
         return Icons.autorenew;
-      case TransactionStatus.on_shipped:
+      case TransactionStatus.on_delivery:
         return Icons.local_shipping;
       case TransactionStatus.completed:
         return Icons.check_circle;

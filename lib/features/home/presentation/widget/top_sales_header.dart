@@ -18,7 +18,7 @@ class TopSalesHeader extends StatelessWidget {
         ),
         const Spacer(),
         GestureDetector(
-          onTap: () => GoRouter.of(context).push('/top-rating'),
+          onTap: () => GoRouter.of(context).push('/top-sales'),
           child: const Text(
             'View All',
             style: TextStyle(

@@ -59,8 +59,8 @@ class TransactionModel extends Transaction {
         return TransactionStatus.awaiting;
       case 'processed':
         return TransactionStatus.processed;
-      case 'on_shipped':
-        return TransactionStatus.on_shipped;
+      case 'on_delivery':
+        return TransactionStatus.on_delivery;
       case 'completed':
         return TransactionStatus.completed;
       case 'cancelled':

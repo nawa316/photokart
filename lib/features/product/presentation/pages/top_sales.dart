@@ -4,14 +4,14 @@ import '../widgets/product_card_model.dart';
 import '../../../../core/widgets/app_header.dart';
 import '../../../../core/widgets/bottom_navbar.dart';
 
-class TopRating extends StatefulWidget {
-  const TopRating({super.key});
+class TopSales extends StatefulWidget {
+  const TopSales({super.key});
 
   @override
-  State<TopRating> createState() => _TopRatingState();
+  State<TopSales> createState() => _TopSalesState();
 }
 
-class _TopRatingState extends State<TopRating> {
+class _TopSalesState extends State<TopSales> {
   final TopRatingViewModel _viewModel = TopRatingViewModel();
   int _currentIndex = 0;
 
@@ -47,14 +47,14 @@ class _TopRatingState extends State<TopRating> {
           body: SafeArea(
             child: Column(
               children: [
-                const AppHeader(title: 'Top Rating', showSearch: false),
+                const AppHeader(title: 'Top Sales', showSearch: false),
                 const SizedBox(height: 24),
 
                 // Title section
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 24),
                   child: Text(
-                    'Top Rated Products',
+                    'Top Selling Products',
                     style: TextStyle(
                       color: Color(0xFF304369),
                       fontSize: 22,
