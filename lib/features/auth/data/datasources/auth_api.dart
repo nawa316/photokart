@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../../../../core/services/supabase_service.dart';
@@ -167,11 +169,44 @@ class AuthApi {
   /// Jika user belum ada di database, throw exception khusus
   Future<String> signInWithGoogle() async {
     try {
-      final GoogleSignIn googleSignIn = GoogleSignIn(
-        scopes: ['email', 'profile'],
+      // Use GoogleSignIn.instance for v7.0+
+      final googleSignIn = GoogleSignIn.instance;
+      
+      // Initialize GoogleSignIn (required in v7.0+)
+      await googleSignIn.initialize();
+      
+      // Create a completer to wait for authentication result
+      final completer = Completer<GoogleSignInAccount?>();
+      
+      // Listen for authentication events
+      final subscription = googleSignIn.authenticationEvents.listen(
+        (event) {
+          if (event is GoogleSignInAuthenticationEventSignIn) {
+            if (!completer.isCompleted) {
+              completer.complete(event.user);
+            }
+          } else if (event is GoogleSignInAuthenticationEventSignOut) {
+            if (!completer.isCompleted) {
+              completer.complete(null);
+            }
+          }
+        },
+        onError: (error) {
+          if (!completer.isCompleted) {
+            completer.completeError(error);
+          }
+        },
       );
-
-      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+      
+      // Authenticate user (replaces signIn() in v7.0+)
+      await googleSignIn.authenticate(
+        scopeHint: ['email', 'profile'],
+      );
+      
+      // Wait for the authentication event
+      final googleUser = await completer.future;
+      subscription.cancel();
+      
       if (googleUser == null) {
         throw Exception('Google sign in cancelled');
       }
@@ -247,7 +282,8 @@ class AuthApi {
   /// Sign out dari Google dan Supabase
   Future<void> signOutGoogle() async {
     try {
-      final GoogleSignIn googleSignIn = GoogleSignIn();
+      // Use GoogleSignIn.instance for v7.0+
+      final googleSignIn = GoogleSignIn.instance;
       await googleSignIn.signOut();
       await _supabaseService.client.auth.signOut();
     } catch (e) {
