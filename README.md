@@ -1,19 +1,96 @@
-# photokart ++
+# 📸 PhotoKart
 
-A new Flutter project.
+PhotoKart adalah aplikasi mobile berbasis **Flutter** yang dirancang sebagai platform **jual-beli photocard** secara terintegrasi. Aplikasi ini menghubungkan **buyer (kolektor)** dan **seller** dalam satu ekosistem yang menyediakan katalog produk, transaksi, chat real-time, serta sistem review dan rating untuk meningkatkan transparansi dan kenyamanan transaksi.
 
-## Getting Started
+Backend aplikasi ini menggunakan **Supabase (Backend as a Service)** yang menangani autentikasi, database PostgreSQL, storage, dan real-time data.
 
-This project is a starting point for a Flutter application.
+---
 
-A few resources to get you started if this is your first Flutter project:
+## 🚀 Deskripsi Proyek
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+PhotoKart hadir untuk mengatasi permasalahan transaksi photocard yang sebelumnya dilakukan secara manual dan tersebar di berbagai platform media sosial. Dengan PhotoKart, seluruh proses mulai dari:
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+* Autentikasi pengguna
+* Pengelolaan profil
+* Manajemen produk
+* Transaksi pembelian
+* Sistem chat real-time
+* Review dan rating produk
+
+dapat dilakukan dalam **satu aplikasi terstruktur dan terintegrasi**.
+
+Teknologi utama yang digunakan:
+
+* **Flutter** → Frontend (Mobile & Web)
+* **Supabase** → Backend (Auth, Database, Storage, Real-time)
+
+---
+
+## ⚙️ Cara Instalasi
+
+### 1. Clone Repository
+
+```bash
+git clone https://github.com/nawa316/photokart.git
+cd photokart
+```
+
+### 2. Install Dependencies Flutter
+
+Pastikan Flutter sudah terpasang, lalu jalankan:
+
+```bash
+flutter pub get
+```
+
+### 3. Konfigurasi Environment
+
+Buat file `.env` di root project:
+
+```env
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+> 🔑 Nilai `SUPABASE_URL` dan `SUPABASE_ANON_KEY` didapat dari dashboard Supabase.
+
+### 4. Pastikan Supabase Terinisialisasi
+
+Supabase diinisialisasi pada `main.dart` menggunakan package `supabase_flutter` dan `flutter_dotenv`.
+
+---
+
+## ▶️ Cara Menjalankan Aplikasi
+
+### Menjalankan di Android / Emulator
+
+```bash
+flutter run
+```
+
+### Menjalankan di Web
+
+```bash
+flutter run -d chrome
+```
+
+### Build APK (Release)
+
+```bash
+flutter build apk --release
+```
+
+### Build Web
+
+```bash
+flutter build web
+```
+
+---
+
+## 📂 Struktur Folder
+
+Berikut gambaran struktur utama project PhotoKart:
 ```
 photokart
 ├─ 📁.dart_tool
@@ -414,3 +491,23 @@ photokart
 ├─ 📄START_HERE.md
 └─ 📄vercel.json
 ```
+
+### Penjelasan Singkat
+
+* **core/** → Infrastruktur utama (Supabase, error handling)
+* **features/** → Struktur modular per fitur (Clean Architecture)
+* **data** → Model, datasource, repository implementation
+* **domain** → Entity & use case
+* **presentation** → UI, state management, dan logic tampilan
+* **shared/** → Widget dan theme yang digunakan bersama
+
+---
+
+## 🔗 Link Terkait
+
+* **Repository GitHub**:
+  [https://github.com/nawa316/photokart](https://github.com/nawa316/photokart)
+* **Demo Web (Vercel)**:
+  [https://photokart-agzj.vercel.app/](https://photokart-agzj.vercel.app/)
+
+---
