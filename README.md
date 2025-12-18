@@ -49,10 +49,10 @@ Buat file `.env` di root project:
 
 ```env
 SUPABASE_URL=your_supabase_project_url
-SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_KEY=your_supabase_key
 ```
 
-> 🔑 Nilai `SUPABASE_URL` dan `SUPABASE_ANON_KEY` didapat dari dashboard Supabase.
+> 🔑 Nilai `SUPABASE_URL` dan `SUPABASE_KEY` didapat dari dashboard Supabase.
 
 ### 4. Pastikan Supabase Terinisialisasi
 
@@ -482,6 +482,7 @@ photokart
 │  └─ 📄CMakeLists.txt
 ├─ 📄.gitignore
 ├─ 📄.metadata
+├─ 📄.env.example
 ├─ 📄analysis_options.yaml
 ├─ 📄FILE_STRUCTURE_OVERVIEW.md
 ├─ 📄FINAL_SUMMARY.md
